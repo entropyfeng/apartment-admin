@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.entropyfeng.apartment.dao.CampusDao">
+
+  <resultMap id="BaseResultMap" type="com.github.entropyfeng.apartment.domain.po.Campus">
+
+    <id column="campus_name" property="campusName"/>
+    <result column="campus_description" property="description"/>
+    <result column="create_time" property="createTime" />
+    <result column="update_time" property="updateTime" />
+
+  </resultMap>
+
+  <sql id="baseSql">
+  campus_name,campus_description,create_time,update_time
+  </sql>
+  <insert id="insertCampus" useGeneratedKeys="true">
+    insert into campus(campus_name,campus_description) VALUES (#{campusName},#{campusDescription})
+  </insert>
+
+  <update id="truncateCampus">
+    truncate table campus
+  </update>
+  <delete id="deleteCampus">
+    delete  from campus where campus_name=#{campusName}
+  </delete>
+
+  <select id="queryCampusByCampusName" resultMap="BaseResultMap" resultType="com.github.entropyfeng.apartment.domain.po.Campus">
+    select <include refid="baseSql"/> from campus where campus_name=#{campusName}
+  </select>
+
+  <select id="queryAllCampus" resultMap="BaseResultMap" resultType="com.github.entropyfeng.apartment.domain.po.Campus">
+    select <include refid="baseSql"/> from campus
+  </select>
+    <select id="queryAllCampusName" resultType="java.lang.String">
+      select campus_name from campus
+    </select>
+</mapper>

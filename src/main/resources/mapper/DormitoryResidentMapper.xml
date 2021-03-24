@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.entropyfeng.apartment.dao.DormitoryResidentDao">
+
+  <resultMap id="ResidentBedVersionMap" type="com.github.entropyfeng.apartment.domain.to.ResidentBedVersion">
+
+    <id column="resident_name" property="residentName"/>
+    <result column="bed_id" property="bedId"/>
+    <result column="version" property="version"/>
+  </resultMap>
+  <resultMap id="ResidentAndBedMap" type="com.github.entropyfeng.apartment.domain.to.ResidentAndBed">
+    <id column="resident_id" property="residentId"/>
+    <result column="bed_id" property="bedId"/>
+  </resultMap>
+  <resultMap id="BatchResidentCountMap" type="com.github.entropyfeng.apartment.domain.to.DormitoryIdAndCount">
+    <id column="dormitory_id" property="dormitoryId"/>
+    <result column="current_count" property="currentCount"/>
+  </resultMap>
+  <resultMap id="DormitoryAndResidentMap" type="com.github.entropyfeng.apartment.domain.to.DormitoryAndResident">
+    <id column="resident_name" property="residentName"/>
+    <result column="bed_id" property="bedId"/>
+    <result column="dormitory_id" property="dormitoryId"/>
+  </resultMap>
+  <resultMap id="DormitoryIdAndVersionMap" type="com.github.entropyfeng.apartment.domain.to.DormitoryIdAndVersion">
+    <id column="dormitory_id" property="dormitoryId"/>
+    <result column="version" property="version"/>
+  </resultMap>
+  <insert id="insertTemplate">
+    insert into dormitory_resident(dormitory_id,bed_id) values (#{dormitoryId},#{bedId})
+  </insert>
+  <insert id="insertBatchTemplate">
+    insert into dormitory_resident(dormitory_id,bed_id) values
+    <foreach collection="list" item="id" separator=",">
+      (#{dormitoryId},#{id})
+    </foreach>
+
+  </insert>
+
+  <update id="truncateDormitoryResident">
+    truncate table dormitory_resident
+  </update>
+
+
+  <update id="updateDormitoryResidentRelyVersion">
+    update dormitory_resident set resident_id=#{residentName} , version=version+1 where dormitory_id=#{dormitoryId} and version=#{version} and bed_id=#{bedId}
+  </update>
+  <update id="updateQuitDormitory">
+    update dormitory_resident set resident_id=null,version=version+1 where dormitory_id=#{dormitoryId} and resident_id=#{residentName} and version=#{version}
+  </update>
+
+  <select id="queryDormitoryCurrentInfo"
+          resultMap="ResidentAndBedMap"
+          resultType="com.github.entropyfeng.apartment.domain.to.ResidentAndBed">
+    select resident_id,bed_id from dormitory_resident where dormitory_id=#{dormitoryId}
+  </select>
+
+  <select id="queryCurrentBedInfo" resultMap="ResidentBedVersionMap"
+          resultType="com.github.entropyfeng.apartment.domain.to.ResidentBedVersion">
+
+    select  resident_id,bed_id,version from dormitory_resident where dormitory_id=#{dormitoryId} and bed_id=#{bedId}
+  </select>
+  <select id="queryResidentCount" resultType="java.lang.Integer">
+    select count(resident_id) from dormitory_resident where dormitory_id=#{dormitoryId}
+  </select>
+  <select id="queryBatchResidentCount" resultType="com.github.entropyfeng.apartment.domain.to.DormitoryIdAndCount"
+  resultMap="BatchResidentCountMap"
+  >
+    select dormitory_id,count(resident_id) as current_count from dormitory_resident where dormitory_id in
+    <foreach collection="list" item="id" open="(" separator="," close=")">
+      #{id}
+    </foreach>
+    group by dormitory_id
+
+  </select>
+  <select id="querySingleResidentStatus" resultType="java.lang.Boolean">
+    select count(dormitory_id) from dormitory_resident where resident_id=#{residentName}
+  </select>
+  <select id="queryAvailableBed" resultType="java.lang.Integer">
+    select bed_id from dormitory_resident where dormitory_id=#{dormitoryId} and resident_id IS NULL
+  </select>
+  <select id="queryIdAndVersionByResidentName"
+          resultMap="DormitoryIdAndVersionMap"
+          resultType="com.github.entropyfeng.apartment.domain.to.DormitoryIdAndVersion">
+
+    select dormitory_id ,version from dormitory_resident where resident_id=#{residentName}
+  </select>
+    <select id="queryCurrentInPerson" resultType="java.lang.String">
+      select resident_id from dormitory_resident where dormitory_id=#{dormitoryId}
+    </select>
+  <select id="queryCurrentBedInfoByResidentName"
+          resultType="java.lang.String">
+    select resident_id from dormitory_resident where dormitory_id=(select dormitory_id from dormitory_resident where resident_id=#{residentName})
+  </select>
+  <select id="queryDormitoryCurrentInfoByResidentName"
+          resultMap="DormitoryAndResidentMap"
+          resultType="com.github.entropyfeng.apartment.domain.to.DormitoryAndResident">
+    select resident_id,dormitory_id,bed_id from dormitory_resident where dormitory_id=(select dormitory_id from dormitory_resident where resident_id=#{residentName})
+
+  </select>
+
+
+</mapper>

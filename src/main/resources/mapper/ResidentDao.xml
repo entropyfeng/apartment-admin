@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.entropyfeng.apartment.dao.ResidentDao">
+  <resultMap id="BaseResultMap" type="com.github.entropyfeng.apartment.domain.po.Resident">
+    <id column="resident_id" jdbcType="VARCHAR" property="residentId" />
+    <result column="college_name" jdbcType="VARCHAR" property="collegeName" />
+    <result column="resident_name" jdbcType="VARCHAR" property="residentName" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <resultMap id="ResidentInfoMap" type="com.github.entropyfeng.apartment.domain.to.ResidentInfo">
+    <result column="resident.resident_id" jdbcType="VARCHAR" property="residentId" />
+    <result column="resident.college_name" jdbcType="VARCHAR" property="collegeName" />
+    <result column="resident.resident_name" jdbcType="VARCHAR" property="residentName" />
+    <result column="dormitory_resident.bed_id" jdbcType="INTEGER" property="bedId"/>
+  </resultMap>
+  <sql id="Base_Column_List">
+     resident_id, college_name,gender, resident_name, create_time, update_time
+  </sql>
+  <delete id="deleteByResidentId">
+    delete from resident where resident_id=#{residentId}
+  </delete>
+
+
+  <select id="selectByResidentId" resultType="com.github.entropyfeng.apartment.domain.po.Resident">
+    select
+    <include refid="Base_Column_List" />
+    from resident
+    where resident_id = #{residentId}
+  </select>
+  <select id="queryResidentInfoByDormitoryId"
+          resultType="com.github.entropyfeng.apartment.domain.to.ResidentInfo">
+    select resident.resident_id,resident.resident_name,resident.college_name,dormitory_resident.bed_id from resident,dormitory_resident where dormitory_resident.dormitory_id=#{dormitory} and dormitory_resident.resident_id=resident.resident_id
+  </select>
+    <select id="selectGenderFromResidentId" resultType="com.github.entropyfeng.apartment.domain.Gender">
+      select gender from resident where resident_id=#{residentId}
+    </select>
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.github.entropyfeng.apartment.domain.po.Resident" useGeneratedKeys="true">
+    insert into resident (resident_id,gender, college_name, resident_name)
+    values (#{resident.residentId,jdbcType=VARCHAR},#{resident.gender}, #{resident.collegeName,jdbcType=VARCHAR}, #{resident.residentName,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.github.entropyfeng.apartment.domain.po.Resident" useGeneratedKeys="true">
+    insert into resident
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="resident.residentId != null">
+        resident_id,
+      </if>
+      <if test="resident.collegeName != null">
+        college_name,
+      </if>
+      <if test="resident.residentName != null">
+        resident_name,
+      </if>
+        <if test="resident.gender!=null" >
+        gender,
+        </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="resident.residentId != null">
+        #{resident.residentId,jdbcType=VARCHAR},
+      </if>
+      <if test="resident.collegeName != null">
+        #{resident.collegeName,jdbcType=VARCHAR},
+      </if>
+      <if test="resident.residentName != null">
+        #{resident.residentName,jdbcType=VARCHAR},
+      </if>
+        <if test="resident.gender !=null">
+          #{resident.gender}
+        </if>
+    </trim>
+  </insert>
+  <update id="updateByResidentIdSelective" parameterType="com.github.entropyfeng.apartment.domain.po.Resident">
+    update resident
+    <set>
+      <if test="resident.collegeName != null">
+        college_name = #{resident.collegeName,jdbcType=VARCHAR},
+      </if>
+      <if test="resident.residentName != null">
+        resident_name = #{resident.residentName,jdbcType=VARCHAR},
+      </if>
+      <if test="resident.gender != null">
+        gender = #{resident.gender},
+      </if>
+    </set>
+    where    resident_id = #{resident.residentId,jdbcType=VARCHAR},
+  </update>
+  <update id="updateByResidentId" parameterType="com.github.entropyfeng.apartment.domain.po.Resident">
+    update resident
+    set college_name = #{resident.collegeName,jdbcType=VARCHAR},
+      resident_name = #{resident.residentName,jdbcType=VARCHAR},
+      gender=#{resident.gender}
+    where resident_id = #{resident.residentId}
+  </update>
+</mapper>

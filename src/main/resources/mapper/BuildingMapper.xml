@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.entropyfeng.apartment.dao.BuildingDao">
+
+
+  <resultMap id="BaseResultMap" type="com.github.entropyfeng.apartment.domain.po.Building">
+    <id column="building_id" property="buildingId"/>
+    <result column="campus_group_id" property="campusGroupId"/>
+    <result column="building_name" property="buildingName"/>
+    <result column="total_floor" property="totalFloor"/>
+    <result column="max_capacity" property="maxCapacity"/>
+    <result column="is_elevator" property="hasElevator"/>
+    <result column="current_capacity" property="currentCapacity"/>
+    <result column="total_dormitory" property="totalDormitory"/>
+    <result column="in_gender" property="inGender" typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler"/>
+    <result column="building_description" property="description"/>
+    <result column="create_time" property="createTime" />
+    <result column="update_time" property="updateTime" />
+  </resultMap>
+
+  <resultMap id="RelativeMapResultMap" type="com.github.entropyfeng.apartment.domain.to.BuildingAndGroup">
+    <id column="building_id" property="buildingId"/>
+    <result column="campus_name" property="campusName"/>
+    <result column="campus_group_name" property="campusGroupName"/>
+    <result column="building_name" property="buildingName"/>
+  </resultMap>
+
+  <sql id="baseSql">
+    building_id,campus_group_id,building_name,total_floor,max_capacity,current_capacity,is_elevator,total_dormitory,in_gender,building_description,create_time,update_time
+  </sql>
+  <insert id="insertBuilding" useGeneratedKeys="true">
+    insert into building(building_id,campus_group_id,building_name,total_floor,max_capacity,current_capacity,total_dormitory,in_gender,building_description,is_elevator)
+     VALUES (#{buildingId},#{campusGroupId},#{buildingName},#{totalFloor},#{maxCapacity},#{currentCapacity},#{totalDormitory},#{inGender},#{description},#{hasElevator})
+  </insert>
+
+  <update id="truncateBuilding">
+    truncate table building
+  </update>
+
+  <select id="queryBuildingByBuildingName" resultMap="BaseResultMap"  resultType="com.github.entropyfeng.apartment.domain.po.Building">
+    select <include refid="baseSql"/> from building where building_name=#{buildingName}
+  </select>
+
+  <select id="queryAllBuilding" resultMap="BaseResultMap" resultType="com.github.entropyfeng.apartment.domain.po.Building">
+    select <include refid="baseSql"/> from building
+  </select>
+    <select id="queryRelativeMap" resultMap="RelativeMapResultMap" resultType="com.github.entropyfeng.apartment.domain.to.BuildingAndGroup">
+      select building_id,campus_name,campus_group_name,building_name from campus_group, building where campus_group.campus_group_id=building.campus_group_id
+    </select>
+  <select id="queryBuildingIdByBuildingName" resultType="java.lang.Integer">
+    select building_id from building where building_name=#{buildingName}
+  </select>
+
+  <select id="queryBuildingExistByBuildingId" resultType="java.lang.Boolean">
+    select count(building_id) from  building where building_id=#{buildingId}
+  </select>
+  <select id="queryAvailableBuilding" resultType="com.github.entropyfeng.apartment.domain.po.Building">
+    select <include refid="baseSql"/> from building,campus_group where campus_group_name=#{campusGroupName} and campus_group.campus_group_id=building.campus_group_id and building.in_gender=#{inGender}
+  </select>
+  <select id="queryAvailableBuildingName" resultType="java.lang.String">
+    select building_name from building,campus_group where campus_group_name=#{campusGroupName} and campus_group.campus_group_id=building.campus_group_id and building.in_gender=#{inGender}
+  </select>
+  <select id="querySingleRelativeMap"
+          resultMap="RelativeMapResultMap"
+          resultType="com.github.entropyfeng.apartment.domain.to.BuildingAndGroup">
+    select building_id,campus_name,campus_group_name,building_name from campus_group, building where building.building_id=#{buildingId} and campus_group.campus_group_id=building.campus_group_id
+  </select>
+</mapper>

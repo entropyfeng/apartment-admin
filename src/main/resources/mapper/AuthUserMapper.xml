@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.entropyfeng.apartment.dao.AuthUserDao">
+
+    <resultMap id="BaseResultMap" type="com.github.entropyfeng.apartment.domain.po.AuthUser">
+        <id column="auth_user_id" property="authUserId"/>
+        <result column="auth_username" property="authUsername"/>
+        <result column="auth_password" property="authPassword"/>
+        <result column="auth_status" property="status"/>
+        <result column="auth_description" property="description"/>
+        <result column="email" property="email"/>
+        <result column="phone" property="phone"/>
+        <result column="nick_name" property="nickName"/>
+        <result column="avatar" property="avatar"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <resultMap id="EmailAndPhoneMap" type="com.github.entropyfeng.apartment.domain.to.EmailAndPhoneInfo">
+        <result column="email" property="email"/>
+        <result column="phone" property="phone"/>
+    </resultMap>
+    <sql id="baseSql">
+        auth_user_id,auth_username,auth_password,auth_status,auth_description,email,phone,nick_name,avatar,create_time,update_time
+    </sql>
+    <insert id="insertAuthUser" useGeneratedKeys="true">
+        insert into auth_user(auth_user_id, auth_username, auth_password)
+        VALUES (#{authUserId}, #{authUsername}, #{authUserPassword})
+    </insert>
+    <insert id="idInsertAuthUserWithAccountStatus" useGeneratedKeys="true">
+        insert into auth_user(auth_user_id, auth_username, auth_password,auth_status)
+        VALUES (#{authUserId}, #{authUsername}, #{authUserPassword},#{status})
+    </insert>
+    <insert id="grantRoleToUser" useGeneratedKeys="true" >
+        insert into auth_user_role(auth_user_id, auth_role_id)
+        VALUES (#{authUserId}, #{authRoleId})
+    </insert>
+    <update id="truncateAuthUser">
+        truncate table auth_user
+    </update>
+    <update id="truncateAuthUserRole">
+        truncate table auth_user_role
+    </update>
+    <update id="updatePasswordByName">
+        update auth_user
+        set auth_password=#{authPassword}
+        where auth_username = #{authUsername}
+    </update>
+
+    <delete id="deleteAuthUserByAuthUserId">
+        delete
+        from auth_user
+        where auth_user_id = #{authUserId}
+    </delete>
+    <delete id="deleteRelationBetweenRoleAndUser">
+        delete
+        from auth_user_role
+        where auth_user_id = #{authUserId}
+          and auth_role_id = #{authRoleId}
+    </delete>
+
+    <select id="queryAuthUserByAuthUserId" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="baseSql"/>
+        from auth_user where auth_user_id=#{authUserId}
+    </select>
+
+    <select id="queryAuthUserByEmail" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        <include refid="baseSql"/>
+        from auth_user where auth_user_id=#{email}
+    </select>
+    <select id="queryAuthUserByPhone" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        <include refid="baseSql"/>
+        from auth_user where auth_user_id=#{phone}
+    </select>
+
+    <select id="queryAllAuthUser" resultMap="BaseResultMap" resultType="com.github.entropyfeng.apartment.domain.po.AuthUser">
+        select
+        <include refid="baseSql"/>
+        from auth_user
+    </select>
+    <select id="queryAuthUserByAuthUsername" resultMap="BaseResultMap"
+            resultType="com.github.entropyfeng.apartment.domain.po.AuthUser">
+        select
+        <include refid="baseSql"/>
+        from auth_user where auth_username=#{authUsername}
+    </select>
+    <select id="queryAuthUserIdByUsername" resultType="java.lang.Long">
+        select auth_user_id
+        from auth_user
+        where auth_username = #{authUsername}
+    </select>
+    <select id="queryAllUsersByPage" resultMap="BaseResultMap"
+            resultType="com.github.entropyfeng.apartment.domain.po.AuthUser">
+        select
+        <include refid="baseSql"/>
+        from auth_user
+    </select>
+    <select id="queryAuthUserExistByAuthUsername" resultType="java.lang.Boolean">
+        select count(auth_user_id)
+        from auth_user
+        where auth_username = #{authUsername}
+    </select>
+
+    <select id="queryUsernameListByUsername" resultType="java.lang.String">
+        select auth_username from auth_user where auth_username in
+        <foreach collection="list" item="name" open="(" separator="," close=")">
+            #{name}
+        </foreach>
+    </select>
+    <select id="queryPasswordByAuthUsername" resultType="java.lang.String">
+        select  auth_password from auth_user where auth_username=#{authUsername}
+    </select>
+    <select id="queryAuthUserNameById" resultType="java.lang.String">
+        select auth_username from auth_user where auth_user_id=#{authUserId}
+    </select>
+
+    <select id="queryAuthUserByUsernames" resultMap="BaseResultMap" resultType="com.github.entropyfeng.apartment.domain.po.AuthUser">
+        select <include refid="baseSql"/> from auth_user where  auth_username in
+        <foreach collection="list" item="name" open="(" separator="," close=")">
+            #{name}
+        </foreach>
+    </select>
+    <delete id="deleteBatchUsers">
+        delete from auth_user where auth_user_id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <delete id="deleteSingleUser">
+        delete
+        from auth_user
+        where auth_user_id = #{authUserId}
+    </delete>
+    <delete id="deleteSingleUserByUsername">
+        delete from auth_user where auth_username=#{authUsername}
+    </delete>
+    <delete id="deleteBatchUsersByUsernames">
+        delete from auth_user where auth_username in
+        <foreach collection="list" item="name" open="(" separator="," close=")">
+            #{name}
+        </foreach>
+    </delete>
+
+    <update id="updateByAuthUserIdSelective" parameterType="com.github.entropyfeng.apartment.domain.po.AuthUser">
+        update auth_user
+        <set>
+            <if test="authUser.apartmentUsername != null">
+                auth_username = #{authUser.apartmentUsername,jdbcType=VARCHAR},
+            </if>
+
+            <if test="authUser.apartmentPassword != null">
+                auth_password=#{authUser.apartmentPassword,jdbcType=VARCHAR}
+            </if>
+            <if test="authUser.description != null">
+                auth_description = #{authUser.description,jdbcType=VARCHAR},
+            </if>
+            <if test="authUser.phone != null">
+                phone = #{authUser.phone,jdbcType=VARCHAR},
+            </if>
+            <if test="authUser.email != null">
+                email = #{authUser.email,jdbcType=VARCHAR},
+            </if>
+            <if test="authUser.nickName != null">
+                nick_name = #{authUser.nickName,jdbcType=VARCHAR},
+            </if>
+            <if test="authUser.status != null">
+                auth_status = #{authUser.status,jdbcType=TINYINT},
+            </if>
+            <if test="authUser.avatar != null">
+                avatar = #{avatar,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where auth_user_id= #{authUser.apartmentUserId,jdbcType=BIGINT}
+    </update>
+    <update id="updateEmailOrPhone">
+        update auth_user
+        <set>
+            <if test="phone!=null">
+                phone=#{phone}
+            </if>
+
+            <if test="email！=null">
+                email=#{email}
+            </if>
+        </set>
+    </update>
+
+    <insert id="insertBaseAuthUser" >
+
+        insert  into auth_user(auth_user_id, auth_username, auth_password, phone, email,auth_status) values (#{authUserId},#{authUserName},#{authPassword},#{email},#{phone},#{status})
+    </insert>
+</mapper>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.entropyfeng.apartment.dao.CampusGroupDao">
+
+  <resultMap id="BaseResultMap" type="com.github.entropyfeng.apartment.domain.po.CampusGroup">
+    <id column="campus_group_id" property="campusGroupId"/>
+    <result column="campus_name" property="campusName"/>
+    <result column="in_gender" property="inGender"/>
+    <result column="campus_group_name" property="campusGroupName"/>
+    <result column="campus_group_description" property="description"/>
+    <result column="create_time" property="createTime" />
+    <result column="update_time" property="updateTime" />
+  </resultMap>
+
+  <resultMap id="RelativeMapResultMap" type="com.github.entropyfeng.apartment.domain.to.CampusAndGroup">
+    <id column="campus_group_id" property="campusGroupId"/>
+    <result column="campus_name" property="campusName"/>
+    <result column="campus_group_name" property="campusGroupName"/>
+  </resultMap>
+  <sql id="baseSql">
+    campus_group_id,campus_name,campus_group_name,in_gender,campus_group_description,create_time,update_time
+  </sql>
+  <insert id="insertCampusGroup" useGeneratedKeys="true">
+    insert into campus_group(campus_group_id,campus_name,campus_group_name,in_gender,campus_group_description)values (#{campusGroupId},#{campusName},#{campusGroupName},#{inGender},#{campusGroupName})
+  </insert>
+
+  <update id="truncateCampusGroup">
+    truncate table campus_group
+  </update>
+  <delete id="deleteCampusGroupByCampusGroupName">
+    delete from campus_group where campus_group_name=#{campusGroupName}
+  </delete>
+
+  <select id="queryCampusGroupByCampusGroupName" resultMap="BaseResultMap" resultType="com.github.entropyfeng.apartment.domain.po.CampusGroup">
+    select <include refid="baseSql"/> from campus_group where campus_group_name=#{campusGroupName}
+  </select>
+
+  <select id="queryAllCampusGroup" resultMap="BaseResultMap" resultType="com.github.entropyfeng.apartment.domain.po.CampusGroup">
+    select <include refid="baseSql"/> from campus_group
+  </select>
+    <select id="queryCampusGroupIdByCampusGroupName" resultType="java.lang.Integer">
+      select campus_group_id from campus_group where  campus_group_name=#{campusGroupName}
+    </select>
+    <select id="queryRelativeMap" resultMap="RelativeMapResultMap" resultType="com.github.entropyfeng.apartment.domain.to.CampusAndGroup">
+      select campus_group_id,campus_group_name,campus_name from campus_group
+    </select>
+  <select id="queryAvailableCampusAndGroup"
+          resultType="com.github.entropyfeng.apartment.domain.po.CampusGroup">
+    select <include refid="baseSql"/> from campus_group where campus_name=#{campusName} and (in_gender=#{inGender} or in_gender=#{mix})
+  </select>
+  <select id="queryAvailableCampusAndGroupName" resultType="java.lang.String">
+
+    select campus_group_name from campus_group where campus_name=#{campusName} and (in_gender=#{inGender} or in_gender=#{mix})
+
+  </select>
+
+</mapper>
