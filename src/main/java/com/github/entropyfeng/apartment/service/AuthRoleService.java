@@ -25,6 +25,7 @@ public interface AuthRoleService {
      */
      void grantResourceToRole(String authRoleName, String authResourceName);
 
+     void addAuthRole(String roleName);
     /**
      *
      * 剥夺某角色的权限

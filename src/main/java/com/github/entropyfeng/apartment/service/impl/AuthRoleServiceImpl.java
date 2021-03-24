@@ -7,6 +7,7 @@ import com.github.entropyfeng.apartment.domain.po.AuthRole;
 import com.github.entropyfeng.apartment.domain.to.PageRequest;
 import com.github.entropyfeng.apartment.exception.AuthResourceNotExistException;
 import com.github.entropyfeng.apartment.exception.AuthRoleNotExistException;
+import com.github.entropyfeng.apartment.service.AuthIdService;
 import com.github.entropyfeng.apartment.service.AuthRoleService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -30,8 +31,9 @@ public class AuthRoleServiceImpl implements AuthRoleService {
 
     private AuthResourceDao authResourceDao;
 
+    private AuthIdService authIdService;
     @Autowired
-    public AuthRoleServiceImpl(AuthRoleDao authRoleDao, AuthResourceDao authResourceDao) {
+    public AuthRoleServiceImpl(AuthIdService authIdService,AuthRoleDao authRoleDao, AuthResourceDao authResourceDao) {
         this.authRoleDao = authRoleDao;
         this.authResourceDao = authResourceDao;
     }
@@ -56,6 +58,12 @@ public class AuthRoleServiceImpl implements AuthRoleService {
         authRoleDao.insertResourceIntoRole(roleId, resourceId);
 
 
+    }
+
+    @Override
+    public void addAuthRole(String roleName) {
+        Long authRoleId=authIdService.getNextAuthRoleId();
+        authRoleDao.insertAuthRole(authRoleId,roleName);
     }
 
     @Override
