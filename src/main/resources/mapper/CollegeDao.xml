@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.entropyfeng.apartment.dao.CollegeDao">
+
+    <resultMap id="BaseResultMap" type="com.github.entropyfeng.apartment.domain.po.College">
+
+        <id column="college_id" property="collegeId"/>
+        <result column="college_name" property="collegeName"/>
+        <result column="college_description" property="description"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+
+    </resultMap>
+
+    <sql id="baseSql">
+        college_id,college_name,college_description,create_time,update_time
+    </sql>
+    <insert id="insertCollege" useGeneratedKeys="true">
+        insert into college(college_id, college_name)
+        VALUES (#{collegeId}, #{collegeName})
+    </insert>
+
+    <update id="truncateCollege">
+        truncate table college
+    </update>
+    <delete id="deleteCollegeByCollegeName">
+        delete
+        from college
+        where college_name = #{collegeName}
+    </delete>
+    <delete id="deleteCollegeByCollegeId">
+        delete
+        from college
+        where college_id = #{collegeId}
+    </delete>
+    <select id="queryCollegeByCollegeName" resultMap="BaseResultMap"
+            resultType="com.github.entropyfeng.apartment.domain.po.College">
+        select
+        <include refid="baseSql"/>
+        from college where college_name=#{collegeName}
+    </select>
+    <select id="queryCollegeByCollegeId" resultMap="BaseResultMap"
+            resultType="com.github.entropyfeng.apartment.domain.po.College">
+        select
+        <include refid="baseSql"/>
+        from college where college_id=#{collegeId}
+    </select>
+    <select id="queryAllCollege" resultMap="BaseResultMap"
+            resultType="com.github.entropyfeng.apartment.domain.po.College">
+        select
+        <include refid="baseSql"/>
+        from college
+    </select>
+    <select id="selectCollegeStatusByCollegeName" resultType="java.lang.Boolean">
+        select count(college_id)
+        from college
+        where college_name = #{collegeName}
+    </select>
+</mapper>
