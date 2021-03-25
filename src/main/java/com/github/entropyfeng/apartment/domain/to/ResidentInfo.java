@@ -15,7 +15,6 @@ public class ResidentInfo {
 
     private String collegeName;
 
-
     private Gender gender;
 
     private Date createTime;

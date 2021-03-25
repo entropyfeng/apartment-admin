@@ -4,6 +4,7 @@ import com.github.entropyfeng.apartment.dao.*;
 import com.github.entropyfeng.apartment.domain.InGender;
 import com.github.entropyfeng.apartment.domain.builder.BuildingVOBuilder;
 import com.github.entropyfeng.apartment.domain.builder.SimpleDormitoryVOBuilder;
+import com.github.entropyfeng.apartment.domain.po.AuthUser;
 import com.github.entropyfeng.apartment.domain.po.Building;
 import com.github.entropyfeng.apartment.domain.po.CampusGroup;
 import com.github.entropyfeng.apartment.domain.vo.BuildingVO;
@@ -51,9 +52,12 @@ public class InitApartmentTest {
     DormitoryService dormitoryService;
 
     @Autowired
+    AuthUserDao authUserDao;
+    @Autowired
     DormitoryResidentDao residentDao;
 
     private ThreadLocalRandom random=ThreadLocalRandom.current();
+
     private void clearAll() {
         idService.clearAllIds();
 
@@ -109,6 +113,7 @@ public class InitApartmentTest {
             return random.nextBoolean()?InGender.WOMAN:InGender.MAN;
         }
     }
+
     private int handleRandomFloor(){
        return random.nextInt(4,8);
     }
@@ -131,7 +136,8 @@ public class InitApartmentTest {
         buildingDao.queryAllBuilding().forEach(this::insertDormitoryBySingleBuilding);
     }
 
-    private void buildResident(){
+    private void buildResidentSkeleton(){
+
         dormitoryDao.queryAllDormitory().forEach(dormitory ->{
             List<Integer> integers= IntStream.range(0,dormitory.getTotalCapacity()).boxed().collect(Collectors.toList());
 
@@ -140,13 +146,18 @@ public class InitApartmentTest {
         });
 
     }
+    private void buildResident(){
+
+       List<AuthUser> authUsers= authUserDao.queryAllAuthUser();
+
+    }
     @Test
     public void init() {
         clearAll();
         buildCampusAndGroup();
         buildBuilding();
         buildDormitory();
-        buildResident();
+        buildResidentSkeleton();
     }
 
 }

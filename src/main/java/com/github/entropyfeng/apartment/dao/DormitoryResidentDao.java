@@ -16,6 +16,7 @@ public interface DormitoryResidentDao {
     void insertTemplate(@Param("dormitoryId") Integer dormitoryId,@Param("bedId")Integer bedId );
 
     void insertBatchTemplate(@Param("dormitoryId")Integer dormitoryId,@Param("list") List<Integer> list);
+
     List<ResidentAndBed> queryDormitoryCurrentInfo(@Param("dormitoryId") Integer dormitoryId);
 
     List<DormitoryAndResident> queryDormitoryCurrentInfoByResidentName(@Param("residentName") String residentName);

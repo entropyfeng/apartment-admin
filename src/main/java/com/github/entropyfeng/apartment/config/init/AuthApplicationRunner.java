@@ -1,5 +1,6 @@
 package com.github.entropyfeng.apartment.config.init;
 
+import com.github.entropyfeng.apartment.event.CacheEvent;
 import com.github.entropyfeng.apartment.event.LoadRbacEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,5 +36,8 @@ public class AuthApplicationRunner implements ApplicationRunner {
         eventPublisher.publishEvent(new LoadRbacEvent(this));
         logger.info("after publish loadAuthDomain Event");
 
+        logger.info("publish cache Event");
+        eventPublisher.publishEvent(new CacheEvent(this));
+        logger.info("after cache Event");
     }
 }

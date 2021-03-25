@@ -19,6 +19,7 @@ public class Resident implements Serializable {
 
     private Date updateTime;
 
+
     private static final long serialVersionUID = 1L;
 
 

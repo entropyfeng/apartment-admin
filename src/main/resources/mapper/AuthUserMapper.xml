@@ -191,6 +191,6 @@
 
     <insert id="insertBaseAuthUser" >
 
-        insert  into auth_user(auth_user_id, auth_username, auth_password, phone, email,auth_status) values (#{authUserId},#{authUserName},#{authPassword},#{email},#{phone},#{status})
+        insert  into auth_user(auth_user_id, auth_username, auth_password, email, phone,auth_status) values (#{authUserId},#{authUserName},#{authPassword},#{email},#{phone},#{status})
     </insert>
 </mapper>

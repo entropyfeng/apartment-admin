@@ -31,6 +31,7 @@ public class AccountController {
 
     @GetMapping("/account/currentUser")
     public Message acquireCurrentUser(@CurrentUserAnno CurrentUser currentUser) {
+
         Message message = new Message();
         Long authUserId = currentUser.getUserId();
         try {

@@ -22,6 +22,7 @@ public interface AuthResourceService {
     List<AuthResource> allResource();
 
 
+    void addNewResource(String name,String method,String path);
 
     @NonNull
     PageInfo<AuthResource> allResourceByPage(PageRequest pageRequest);

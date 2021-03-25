@@ -46,7 +46,7 @@ public class RbacListener implements ApplicationListener<LoadRbacEvent> {
     @Override
     public void onApplicationEvent(LoadRbacEvent rbacEvent) {
 
-
+        logger.info("load or reload RBAC");
         //加载前首先清空对应的redis数据
         Collection<String> res = redisTemplate.keys("*");
         if (!CollectionUtils.isEmpty(res)) {

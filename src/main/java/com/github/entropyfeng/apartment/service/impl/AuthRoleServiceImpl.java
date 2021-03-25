@@ -27,15 +27,16 @@ public class AuthRoleServiceImpl implements AuthRoleService {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthRoleServiceImpl.class);
 
-    private AuthRoleDao authRoleDao;
+    private final AuthRoleDao authRoleDao;
 
-    private AuthResourceDao authResourceDao;
+    private final AuthResourceDao authResourceDao;
 
-    private AuthIdService authIdService;
+    private final AuthIdService authIdService;
     @Autowired
     public AuthRoleServiceImpl(AuthIdService authIdService,AuthRoleDao authRoleDao, AuthResourceDao authResourceDao) {
         this.authRoleDao = authRoleDao;
         this.authResourceDao = authResourceDao;
+        this.authIdService=authIdService;
     }
 
     @Override

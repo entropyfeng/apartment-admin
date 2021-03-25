@@ -25,4 +25,4 @@ mybatis:
 
 logging:
   level:
-    com.github.entropyfeng.auth.dao : info #打印sql
+    com.github.entropyfeng.apartment : info #打印sql

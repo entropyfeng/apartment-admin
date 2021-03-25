@@ -16,7 +16,7 @@ public class CampusGroupController {
     CampusService campusService;
 
     @GetMapping("/apartment/campusGroup/all")
-    public Message acquireAllCampusGroups(){
+    public Message acquireAllCampusGroup(){
         List<CampusGroup> campusGroups=campusService.queryAllCampusGroup();
         Message message=new Message();
         message.setSuccess(true);

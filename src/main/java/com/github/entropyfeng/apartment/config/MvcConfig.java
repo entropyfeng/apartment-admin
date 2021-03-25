@@ -14,19 +14,24 @@ import java.util.List;
 @Configuration
 public class MvcConfig implements WebMvcConfigurer {
 
+    @Autowired
+    public MvcConfig(AuthGlobalFilter authGlobalFilter) {
+        this.authGlobalFilter = authGlobalFilter;
+    }
+
     @Bean
     CurrentUserHandlerMethodArgResolver currentUserHandlerMethodArgResolver(){
         return new CurrentUserHandlerMethodArgResolver();
     }
 
 
-    @Autowired
+    final
     AuthGlobalFilter authGlobalFilter;
 
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(authGlobalFilter);
+        registry.addInterceptor(authGlobalFilter).excludePathPatterns("/account/login");
 
     }
 
