@@ -20,7 +20,7 @@ public class DormitoryController {
     }
 
     @GetMapping("/apartment/dormitory")
-    public Message queryDormitory(@Param("buildingId")Integer buildingId){
+    public Message acquireDormitoryByBuildingId(@Param("buildingId")Integer buildingId){
 
         Message message=new Message();
         List<SimpleDormitoryVO> dormitoryVOList= dormitoryService.queryDormitories(buildingId);

@@ -1,5 +1,6 @@
 package com.github.entropyfeng.apartment.service.impl;
 
+import com.github.entropyfeng.apartment.config.cache.CampusCache;
 import com.github.entropyfeng.apartment.dao.BuildingDao;
 import com.github.entropyfeng.apartment.dao.CampusGroupDao;
 import com.github.entropyfeng.apartment.domain.InGender;
@@ -29,14 +30,16 @@ public class BuildingServiceImpl implements BuildingService {
     private final BuildingDao buildingDao;
 
     private final ApartmentIdService idService;
+    private final CampusCache campusCache;
     private StringRedisTemplate redisTemplate;
 
     @Autowired
-    public BuildingServiceImpl(StringRedisTemplate redisTemplate, ApartmentIdService idService, CampusGroupDao campusGroupDao, BuildingDao buildingDao) {
+    public BuildingServiceImpl(StringRedisTemplate redisTemplate,CampusCache campusCache, ApartmentIdService idService, CampusGroupDao campusGroupDao, BuildingDao buildingDao) {
         this.campusGroupDao = campusGroupDao;
         this.buildingDao = buildingDao;
         this.idService = idService;
         this.redisTemplate = redisTemplate;
+        this.campusCache=campusCache;
     }
 
 
@@ -71,23 +74,12 @@ public class BuildingServiceImpl implements BuildingService {
 
     @Override
     public Map<Integer, BuildingAndGroup> acquireBuildingAndGroupMap() {
-        List<BuildingAndGroup> buildingAndGroups = buildingDao.queryRelativeMap();
-        Map<Integer, BuildingAndGroup> map = new HashMap<>();
-
-        buildingAndGroups.forEach(buildingAndGroup -> map.put(buildingAndGroup.getBuildingId(), buildingAndGroup));
-        redisTemplate.opsForHash().putAll(BUILDING_INFO_FIELD,map);
-        return map;
+        return campusCache.getMap();
     }
 
     @Override
     public BuildingAndGroup acquireBuildingAndGroupByBuildingID(@NotNull Integer buildingId) {
 
-
-        BuildingAndGroup buildingAndGroup = (BuildingAndGroup) redisTemplate.opsForHash().get(BUILDING_INFO_FIELD, buildingId);
-        if (buildingAndGroup == null) {
-            buildingAndGroup = buildingDao.querySingleRelativeMap(buildingId);
-
-        }
-        return buildingAndGroup;
+        return campusCache.getBuildingAndGroup(buildingId);
     }
 }

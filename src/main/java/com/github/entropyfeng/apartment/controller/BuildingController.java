@@ -28,6 +28,7 @@ public class BuildingController {
        message.addData("buildings",buildingVOS);
        return message;
     }
+
     @PostMapping("/apartment/building")
     public Message addNewBuilding(@RequestBody BuildingVO buildingVO){
         Message message=new Message();

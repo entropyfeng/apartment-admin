@@ -2,10 +2,13 @@ package com.github.entropyfeng.apartment.config;
 
 import com.github.entropyfeng.apartment.config.intecepror.AuthGlobalFilter;
 import com.github.entropyfeng.apartment.config.intecepror.CurrentUserHandlerMethodArgResolver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -28,6 +31,7 @@ public class MvcConfig implements WebMvcConfigurer {
     final
     AuthGlobalFilter authGlobalFilter;
 
+    private static final Logger logger= LoggerFactory.getLogger(MvcConfig.class);
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
@@ -38,5 +42,16 @@ public class MvcConfig implements WebMvcConfigurer {
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(currentUserHandlerMethodArgResolver());
+    }
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowCredentials(true)
+                .allowedHeaders("*")    //允许任何头
+                .allowedOrigins("*")    //允许任何域名
+                .allowedMethods("*");   //允许任何方法
+
+        logger.info("add cros mapping");
     }
 }

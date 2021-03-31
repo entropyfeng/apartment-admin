@@ -1,5 +1,6 @@
 package com.github.entropyfeng.apartment.service.impl;
 
+import com.github.entropyfeng.apartment.config.cache.CampusCache;
 import com.github.entropyfeng.apartment.dao.BuildingDao;
 import com.github.entropyfeng.apartment.dao.DormitoryDao;
 import com.github.entropyfeng.apartment.dao.DormitoryResidentDao;
@@ -35,17 +36,19 @@ public class DormitoryServiceImpl implements DormitoryService {
 
 
     @Autowired
-    public DormitoryServiceImpl(BuildingService buildingService, ResidentDao residentDao, ApartmentIdService idService, DormitoryResidentDao dormitoryResidentDao, DormitoryDao dormitoryDao, BuildingDao buildingDao) {
+    public DormitoryServiceImpl(BuildingService buildingService, CampusCache campusCache, ResidentDao residentDao, ApartmentIdService idService, DormitoryResidentDao dormitoryResidentDao, DormitoryDao dormitoryDao, BuildingDao buildingDao) {
         this.dormitoryDao = dormitoryDao;
         this.residentDao=residentDao;
         this.buildingDao = buildingDao;
         this.idService = idService;
         this.dormitoryResidentDao = dormitoryResidentDao;
         this.buildingService = buildingService;
+        this.campusCache=campusCache;
     }
 
     private final ApartmentIdService idService;
 
+    private final CampusCache campusCache;
     private final DormitoryDao dormitoryDao;
 
     private final BuildingDao buildingDao;

@@ -38,7 +38,11 @@ public class AuthGlobalFilter implements HandlerInterceptor {
     private final Logger logger = LoggerFactory.getLogger(AuthGlobalFilter.class);
 
     private JwtAccount parseToken(String authToken, HttpServletResponse response) {
+
         JwtAccount jwtAccount = null;
+        if (StringUtils.isEmpty(authToken)){
+            return null;
+        }
         Message message = new Message();
 
         if (!StringUtils.isEmpty(authToken)) {

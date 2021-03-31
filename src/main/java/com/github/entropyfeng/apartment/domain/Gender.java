@@ -22,7 +22,9 @@ public enum Gender {
     public static Gender toInGender(String target){
 
         switch (target){
-            case  "WOMAN":return Gender.WOMAN;
+            case  "WOMAN" :
+            case  "女":return Gender.WOMAN;
+            case "男":
             case "MAN":return Gender.MAN;
             default:return Gender.UNKNOWN;
         }
