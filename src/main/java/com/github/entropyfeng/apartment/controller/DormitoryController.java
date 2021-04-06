@@ -3,6 +3,8 @@ package com.github.entropyfeng.apartment.controller;
 import com.github.entropyfeng.apartment.domain.vo.DormitoryVO;
 import com.github.entropyfeng.apartment.domain.vo.SimpleDormitoryVO;
 import com.github.entropyfeng.apartment.service.DormitoryService;
+import com.github.entropyfeng.common.config.anno.CurrentUserAnno;
+import com.github.entropyfeng.common.domain.CurrentUser;
 import com.github.entropyfeng.common.domain.Message;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +21,7 @@ public class DormitoryController {
         this.dormitoryService = dormitoryService;
     }
 
+
     @GetMapping("/apartment/dormitory")
     public Message acquireDormitoryByBuildingId(@Param("buildingId")Integer buildingId){
 
@@ -26,6 +29,16 @@ public class DormitoryController {
         List<SimpleDormitoryVO> dormitoryVOList= dormitoryService.queryDormitories(buildingId);
         message.setSuccess(true);
         message.addData("dormitories",dormitoryVOList);
+        return message;
+    }
+
+    @GetMapping("/apartment/dormitory/my")
+    public Message acquireMyDormitory(@CurrentUserAnno CurrentUser currentUser){
+        Message message=new Message();
+        String username=currentUser.getUserName();
+        DormitoryVO dormitoryVO= dormitoryService.acquireDormitory(username);
+        message.setSuccess(true);
+        message.addData("dormitory",dormitoryVO);
         return message;
     }
 }

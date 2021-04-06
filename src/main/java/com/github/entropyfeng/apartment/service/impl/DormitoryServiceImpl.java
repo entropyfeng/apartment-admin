@@ -34,16 +34,15 @@ public class DormitoryServiceImpl implements DormitoryService {
     private static final Logger logger = LoggerFactory.getLogger(DormitoryServiceImpl.class);
 
 
-
     @Autowired
     public DormitoryServiceImpl(BuildingService buildingService, CampusCache campusCache, ResidentDao residentDao, ApartmentIdService idService, DormitoryResidentDao dormitoryResidentDao, DormitoryDao dormitoryDao, BuildingDao buildingDao) {
         this.dormitoryDao = dormitoryDao;
-        this.residentDao=residentDao;
+        this.residentDao = residentDao;
         this.buildingDao = buildingDao;
         this.idService = idService;
         this.dormitoryResidentDao = dormitoryResidentDao;
         this.buildingService = buildingService;
-        this.campusCache=campusCache;
+        this.campusCache = campusCache;
     }
 
     private final ApartmentIdService idService;
@@ -128,22 +127,17 @@ public class DormitoryServiceImpl implements DormitoryService {
     @Override
     public DormitoryVO acquireDormitory(@NotNull String dormitoryName) {
         Dormitory dormitory = dormitoryDao.queryDormitoryByDormitoryName(dormitoryName);
-        Integer dormitoryId = dormitory.getDormitoryId();
-        Integer buildingId=dormitory.getBuildingId();
-
-        List<ResidentInfo> list=residentDao.queryResidentInfoByDormitoryId(dormitoryId);
-        return new DormitoryVO(dormitory, buildingService.acquireBuildingAndGroupByBuildingID(buildingId), list);
+        Integer buildingId = dormitory.getBuildingId();
+        return new DormitoryVO(dormitory, buildingService.acquireBuildingAndGroupByBuildingID(buildingId));
     }
 
     @Override
     public DormitoryVO acquireUserDormitory(@NotNull String residentId) {
 
-        Dormitory dormitory= dormitoryDao.queryDormitoryByResidentId(residentId);
-        Integer dormitoryId = dormitory.getDormitoryId();
-        Integer buildingId=dormitory.getBuildingId();
+        Dormitory dormitory = dormitoryDao.queryDormitoryByResidentId(residentId);
+        Integer buildingId = dormitory.getBuildingId();
 
-        List<ResidentInfo> list=residentDao.queryResidentInfoByDormitoryId(dormitoryId);
-        return new DormitoryVO(dormitory, buildingService.acquireBuildingAndGroupByBuildingID(buildingId), list);
+        return new DormitoryVO(dormitory, buildingService.acquireBuildingAndGroupByBuildingID(buildingId));
 
     }
 
