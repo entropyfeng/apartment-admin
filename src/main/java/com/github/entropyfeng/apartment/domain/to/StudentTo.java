@@ -11,6 +11,20 @@ public class StudentTo {
     private String collegeName;
     private String registerYear;
 
+    public StudentTo(StudentTo studentTo){
+        this.studentId = studentTo.studentId;
+        this.studentName = studentTo.studentName;
+        this.idCardNumber = studentTo.idCardNumber;
+        this.email = studentTo.email;
+        this.phone =studentTo.phone;
+        this.gender = studentTo.gender;
+        this.collegeName = studentTo.gender;
+        this.registerYear = studentTo.registerYear;
+    }
+
+    public StudentTo(){
+
+    }
     public StudentTo(String studentId, String studentName, String idCardNumber, String email, String phone, String gender, String collegeName, String registerYear) {
         this.studentId = studentId.trim();
         this.studentName = studentName.trim();

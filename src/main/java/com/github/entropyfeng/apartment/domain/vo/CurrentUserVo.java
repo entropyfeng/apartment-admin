@@ -16,6 +16,7 @@ public class CurrentUserVo {
     String access;
     String signature;
     String group;
+    Integer unreadCount;
 
 
     public CurrentUserVo(String avatar, String username, String userid) {
@@ -116,6 +117,14 @@ public class CurrentUserVo {
 
     public void setTrueName(String trueName) {
         this.trueName = trueName;
+    }
+
+    public Integer getUnreadCount() {
+        return unreadCount;
+    }
+
+    public void setUnreadCount(Integer unreadCount) {
+        this.unreadCount = unreadCount;
     }
 
     public String getChinaIdNumber() {

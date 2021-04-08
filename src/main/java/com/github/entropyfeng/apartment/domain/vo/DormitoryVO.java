@@ -2,10 +2,8 @@ package com.github.entropyfeng.apartment.domain.vo;
 
 import com.github.entropyfeng.apartment.domain.po.Dormitory;
 import com.github.entropyfeng.apartment.domain.to.BuildingAndGroup;
-import com.github.entropyfeng.apartment.domain.to.ResidentInfo;
 
 import java.util.Date;
-import java.util.List;
 
 
 public class DormitoryVO  {

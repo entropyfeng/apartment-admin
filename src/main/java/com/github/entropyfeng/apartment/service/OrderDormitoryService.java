@@ -1,6 +1,6 @@
 package com.github.entropyfeng.apartment.service;
 
-import com.github.entropyfeng.apartment.domain.vo.SimpleDormitoryVO;
+import com.github.entropyfeng.apartment.domain.vo.DormitoryVO;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -8,7 +8,7 @@ import java.util.List;
 public interface OrderDormitoryService {
 
 
-    List<SimpleDormitoryVO> filterAvailableDormitory(@NotNull String residentId, @NotNull String buildingName);
+    List<DormitoryVO> filterAvailableDormitory(@NotNull String residentId, @NotNull String buildingName);
 
     List<String> filterAvailableCampusGroup(@NotNull String residentId,@NotNull String campusName);
 

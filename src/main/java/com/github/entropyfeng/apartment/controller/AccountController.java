@@ -12,10 +12,12 @@ import com.github.entropyfeng.common.config.anno.CurrentUserAnno;
 import com.github.entropyfeng.common.domain.CurrentUser;
 import com.github.entropyfeng.common.domain.Message;
 
+import io.swagger.annotations.Api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 
 @RestController
@@ -29,15 +31,18 @@ public class AccountController {
         this.authUserService = authUserService;
     }
 
+
     @GetMapping("/account/currentUser")
-    public Message acquireCurrentUser(@CurrentUserAnno CurrentUser currentUser) {
+    public Message acquireCurrentUser(@ApiIgnore @CurrentUserAnno CurrentUser currentUser) {
 
         Message message = new Message();
         Long authUserId = currentUser.getUserId();
         try {
             AuthUser authUser = authUserService.getAuthUserById(authUserId);
             CurrentUserVo currentUserVo = new CurrentUserVo(authUser.getAvatar(), authUser.getAuthUsername(), authUser.getAuthUserId().toString());
+            currentUserVo.setAccess("admin");
             message.addData("current_user", currentUserVo);
+
             message.setSuccess(true);
         } catch (AuthUserNotExistException e) {
             logger.info("not exist {}", authUserId);
@@ -68,8 +73,8 @@ public class AccountController {
             Long authUserId = authUserService.getAuthUserIdByName(username);
             message.setSuccess(true);
             message.addData("token", token);
-            message.addData("status", "ok");
             message.addData("auth_user_id", authUserId);
+            message.addData("loginType","account");
             return message;
         } catch (PasswordErrorException e) {
 

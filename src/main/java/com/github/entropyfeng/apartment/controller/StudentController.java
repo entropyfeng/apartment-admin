@@ -2,9 +2,11 @@ package com.github.entropyfeng.apartment.controller;
 
 import com.github.entropyfeng.apartment.domain.vo.StudentVO;
 import com.github.entropyfeng.apartment.service.StudentService;
+import com.github.entropyfeng.apartment.util.FileUtil;
 import com.github.entropyfeng.common.config.anno.CurrentUserAnno;
 import com.github.entropyfeng.common.domain.CurrentUser;
 import com.github.entropyfeng.common.domain.Message;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +27,21 @@ public class StudentController {
         this.studentService = studentService;
     }
 
+    @GetMapping("/university/student/excel/template")
+    public Message downloadInsertStudentTemplate(){
+
+
+       byte[] bytes= FileUtil.downloadLocal("excel/BatchInsertStudentTemplate.xlsx");
+       //bytes= Base64.getEncoder().encode(bytes);
+       Message message=new Message();
+       message.setSuccess(true);
+       message.addData("file",new String(bytes));
+       message.addData("fileName","BatchInsertStudentTemplate.xlsx");
+       return message;
+    }
 
     @PostMapping("/university/student/excel")
-    public Message insertStudentsFromExcel(@CurrentUserAnno CurrentUser currentUser, @org.jetbrains.annotations.NotNull @RequestParam("file") MultipartFile file)throws IOException {
+    public Message insertStudentsFromExcel(@CurrentUserAnno CurrentUser currentUser,  @RequestParam("file") MultipartFile file)throws IOException {
 
         Message message=new Message();
         if (file.getOriginalFilename()==null){

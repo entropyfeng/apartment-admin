@@ -7,7 +7,7 @@ import com.github.entropyfeng.apartment.domain.po.Dormitory;
 import com.github.entropyfeng.apartment.domain.to.BuildingAndGroup;
 import com.github.entropyfeng.apartment.domain.to.DormitoryIdAndVersion;
 import com.github.entropyfeng.apartment.domain.to.ResidentBedVersion;
-import com.github.entropyfeng.apartment.domain.vo.SimpleDormitoryVO;
+import com.github.entropyfeng.apartment.domain.vo.DormitoryVO;
 import com.github.entropyfeng.apartment.exception.BusinessParaException;
 import com.github.entropyfeng.apartment.service.BuildingService;
 import com.github.entropyfeng.apartment.service.OrderDormitoryService;
@@ -34,22 +34,22 @@ public class OrderDormitoryServiceImpl implements OrderDormitoryService {
     final
     BuildingDao buildingDao;
 
+    final StudentDao studentDao;
     final
     DormitoryDao dormitoryDao;
     final DormitoryResidentDao dormitoryResidentDao;
-    final ResidentDao residentDao;
     final BuildingService buildingService;
 
 
     @Autowired
-    public OrderDormitoryServiceImpl(BuildingService buildingService, ResidentDao residentDao, CampusGroupDao campusGroupDao, CampusDao campusDao, BuildingDao buildingDao, DormitoryDao dormitoryDao, DormitoryResidentDao dormitoryResidentDao) {
+    public OrderDormitoryServiceImpl(StudentDao studentDao, BuildingService buildingService, CampusGroupDao campusGroupDao, CampusDao campusDao, BuildingDao buildingDao, DormitoryDao dormitoryDao, DormitoryResidentDao dormitoryResidentDao) {
         this.campusGroupDao = campusGroupDao;
         this.campusDao = campusDao;
+        this.studentDao=studentDao;
         this.buildingDao = buildingDao;
         this.dormitoryDao = dormitoryDao;
         this.dormitoryResidentDao = dormitoryResidentDao;
         this.buildingService = buildingService;
-        this.residentDao = residentDao;
     }
 
     @Override
@@ -73,7 +73,7 @@ public class OrderDormitoryServiceImpl implements OrderDormitoryService {
     }
 
     @Override
-    public List<SimpleDormitoryVO> filterAvailableDormitory(@NotNull String residentId, @NotNull String buildingName) {
+    public List<DormitoryVO> filterAvailableDormitory(@NotNull String residentId, @NotNull String buildingName) {
 
         InGender gender = acquireInGender(residentId);
         List<Dormitory> dormitoryList = dormitoryDao.queryFilterDormitoryByBuildingName(buildingName, gender);
@@ -172,15 +172,16 @@ public class OrderDormitoryServiceImpl implements OrderDormitoryService {
     }
 
 
-    private List<SimpleDormitoryVO> postHandlerDormitoryList(List<Dormitory> dormitoryList) {
+    private List<DormitoryVO> postHandlerDormitoryList(List<Dormitory> dormitoryList) {
 
         Map<Integer, BuildingAndGroup> map = buildingService.acquireBuildingAndGroupMap();
-        return dormitoryList.stream().map(dormitory -> new SimpleDormitoryVO(dormitory, map.get(dormitory.getBuildingId()))).collect(Collectors.toList());
+        return dormitoryList.stream().map(dormitory -> new DormitoryVO(dormitory, map.get(dormitory.getBuildingId()))).collect(Collectors.toList());
 
     }
 
     private InGender acquireInGender(String residentId) {
-        Gender gender = residentDao.selectGenderFromResidentId(residentId);
+
+        Gender gender = studentDao.queryStudentGenderByStudentId(residentId);
         InGender inGender;
         switch (gender) {
             case MAN:

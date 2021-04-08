@@ -31,16 +31,19 @@ public interface DormitoryDao {
     Dormitory queryDormitoryByResidentId(@Param("residentId") String residentId);
     List<Dormitory> queryAllDormitory();
 
+    int insertSelective(Dormitory record);
+    List<Dormitory> queryDormitorySelective(@Param("dormitoryName")String dormitoryName,@Param("buildingName")String buildingName,@Param("inGender")InGender inGender);
 
     List<Dormitory> queryDormitoryByBuildingId(@Param("buildingId") Integer buildingId);
 
     List<Dormitory> queryFilterDormitoryByBuildingName(@Param("buildingName")String buildingName,@Param("inGender") InGender inGender);
+
     Dormitory queryDormitoryByDormitoryId(@Param("dormitoryId") Integer dormitoryId);
 
     Long queryVersionByDormitoryId(@Param("dormitoryId") Integer dormitoryId);
 
     Dormitory filterDormitoryByGender(@Param("inGender") InGender inGender);
 
-
     Integer updateCurrentCapacityRelyVersion(@Param("dormitoryId") Integer dormitoryId,@Param("currentCapacity")Integer currentCapacity,@Param("version")Long version);
+
 }

@@ -1,6 +1,6 @@
 package com.github.entropyfeng.apartment.controller;
 
-import com.github.entropyfeng.apartment.domain.vo.SimpleDormitoryVO;
+import com.github.entropyfeng.apartment.domain.vo.DormitoryVO;
 import com.github.entropyfeng.apartment.service.OrderDormitoryService;
 import com.github.entropyfeng.common.config.anno.CurrentUserAnno;
 import com.github.entropyfeng.common.domain.CurrentUser;
@@ -30,7 +30,7 @@ public class OrderDormitoryController {
         Message message=new Message();
         message.setSuccess(true);
         String username=currentUser.getUserName();
-        List<SimpleDormitoryVO> simpleDormitoryVOS= orderService.filterAvailableDormitory(username,buildingName);
+        List<DormitoryVO> simpleDormitoryVOS= orderService.filterAvailableDormitory(username,buildingName);
         message.addData("dormitories",simpleDormitoryVOS);
         return message;
     }

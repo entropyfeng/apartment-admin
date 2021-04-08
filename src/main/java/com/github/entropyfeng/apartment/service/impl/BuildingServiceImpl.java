@@ -74,7 +74,7 @@ public class BuildingServiceImpl implements BuildingService {
 
     @Override
     public Map<Integer, BuildingAndGroup> acquireBuildingAndGroupMap() {
-        return campusCache.getMap();
+        return campusCache.getBuildingIdMap();
     }
 
     @Override

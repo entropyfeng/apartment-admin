@@ -20,6 +20,7 @@ public interface DormitoryResidentDao {
     List<ResidentAndBed> queryDormitoryCurrentInfo(@Param("dormitoryId") Integer dormitoryId);
 
     List<DormitoryAndResident> queryDormitoryCurrentInfoByResidentName(@Param("residentName") String residentName);
+
     List<String> queryCurrentBedInfoByResidentName(@Param("residentName") String residentName);
 
     Integer updateDormitoryResidentRelyVersion(@Param("dormitoryId") Integer dormitoryId, @Param("bedId") Integer bedId, @Param("residentName") String residentName, @Param("version") Long version);

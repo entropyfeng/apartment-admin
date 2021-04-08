@@ -42,6 +42,73 @@
                 #{inGender}, #{totalCapacity}, #{dormitoryDirection}, #{description})
     </insert>
 
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.github.entropyfeng.apartment.domain.po.Dormitory" useGeneratedKeys="true">
+        insert into dormitory
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="dormitoryId != null">
+                dormitory_id,
+            </if>
+            <if test="buildingId != null">
+                building_id,
+            </if>
+            <if test="floor != null">
+                floor,
+            </if>
+            <if test="dormitoryName != null">
+                dormitory_name,
+            </if>
+            <if test="totalCapacity != null">
+                total_capacity,
+            </if>
+            <if test="currentCapacity != null">
+                current_capacity,
+            </if>
+            <if test="inGender != null">
+                in_gender,
+            </if>
+            <if test="dormitoryDirection != null">
+                dormitory_direction,
+            </if>
+            <if test="description != null">
+                dormitory_description,
+            </if>
+            <if test="version != null">
+                version,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="dormitoryId != null">
+                #{dormitoryId,jdbcType=INTEGER},
+            </if>
+            <if test="buildingId != null">
+                #{buildingId,jdbcType=INTEGER},
+            </if>
+            <if test="floor != null">
+                #{floor,jdbcType=INTEGER},
+            </if>
+            <if test="dormitoryName != null">
+                #{dormitoryName,jdbcType=VARCHAR},
+            </if>
+            <if test="totalCapacity != null">
+                #{totalCapacity,jdbcType=INTEGER},
+            </if>
+            <if test="currentCapacity != null">
+                #{currentCapacity,jdbcType=INTEGER},
+            </if>
+            <if test="inGender != null">
+                #{inGender,jdbcType=TINYINT},
+            </if>
+            <if test="dormitoryDirection != null">
+                #{dormitoryDirection,jdbcType=TINYINT},
+            </if>
+            <if test="description != null">
+                #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="version != null">
+                #{version,jdbcType=BIGINT},
+            </if>
+        </trim>
+    </insert>
     <update id="truncateDormitory">
         truncate table dormitory
     </update>

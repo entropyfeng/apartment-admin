@@ -3,13 +3,12 @@ package com.github.entropyfeng.apartment;
 import com.github.entropyfeng.apartment.dao.*;
 import com.github.entropyfeng.apartment.domain.InGender;
 import com.github.entropyfeng.apartment.domain.builder.BuildingVOBuilder;
-import com.github.entropyfeng.apartment.domain.builder.SimpleDormitoryVOBuilder;
+import com.github.entropyfeng.apartment.domain.builder.DormitoryVOBuilder;
 import com.github.entropyfeng.apartment.domain.po.AuthUser;
 import com.github.entropyfeng.apartment.domain.po.Building;
 import com.github.entropyfeng.apartment.domain.po.CampusGroup;
 import com.github.entropyfeng.apartment.domain.vo.BuildingVO;
 import com.github.entropyfeng.apartment.domain.vo.DormitoryVO;
-import com.github.entropyfeng.apartment.domain.vo.SimpleDormitoryVO;
 import com.github.entropyfeng.apartment.service.ApartmentIdService;
 import com.github.entropyfeng.apartment.service.BuildingService;
 import com.github.entropyfeng.apartment.service.CampusService;
@@ -91,8 +90,8 @@ public class InitApartmentTest {
         for (int floorNumber = 1; floorNumber <= building.getTotalFloor(); floorNumber++) {
             for (int roomNumber = 1; roomNumber <= 30; roomNumber++) {
                 
-                SimpleDormitoryVOBuilder builder = new SimpleDormitoryVOBuilder(building.getBuildingName() + "Floor:" + floorNumber + ":" + roomNumber, building.getBuildingName());
-                SimpleDormitoryVO simpleDormitoryVO = builder.setFloor(floorNumber).setTotalCapacity(4).setCurrentCapacity(0).setInGender(building.getInGender()).build();
+                DormitoryVOBuilder builder = new DormitoryVOBuilder(building.getBuildingName() + "Floor:" + floorNumber + ":" + roomNumber, building.getBuildingName());
+                DormitoryVO simpleDormitoryVO = builder.setFloor(floorNumber).setTotalCapacity(4).setCurrentCapacity(0).setInGender(building.getInGender()).build();
 
                 dormitoryService.addNewDormitory(simpleDormitoryVO);
 
