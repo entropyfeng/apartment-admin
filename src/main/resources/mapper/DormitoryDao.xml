@@ -2,7 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.github.entropyfeng.apartment.dao.DormitoryDao">
 
-
     <resultMap id="BaseResultMap" type="com.github.entropyfeng.apartment.domain.po.Dormitory">
         <id column="dormitory_id" property="dormitoryId"/>
         <result column="building_id" property="buildingId"/>
@@ -159,4 +158,5 @@
     <select id="queryDormitoryByResidentId" resultType="com.github.entropyfeng.apartment.domain.po.Dormitory">
         select <include refid="dormitoryPrefixBaseSql"/> from dormitory ,dormitory_resident where dormitory_resident.resident_id=#{residentId} and dormitory_resident.dormitory_id=dormitory.dormitory_id
     </select>
+
 </mapper>

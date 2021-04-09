@@ -94,8 +94,13 @@
   <select id="queryDormitoryCurrentInfoByResidentName"
           resultMap="DormitoryAndResidentMap"
           resultType="com.github.entropyfeng.apartment.domain.to.DormitoryAndResident">
-    select resident_id,dormitory_id,bed_id from dormitory_resident where dormitory_id=(select dormitory_id from dormitory_resident where resident_id=#{residentName})
+    select resident_id,dormitory_id,bed_id from dormitory_resident where dormitory_id in (select dormitory_id from dormitory_resident where resident_id=#{residentName})
 
+  </select>
+  <select id="queryDormitoryCurrentInfoByDormitoryId"
+          resultType="com.github.entropyfeng.apartment.domain.to.DormitoryAndResident">
+
+    select resident_id,dormitory_id,bed_id from dormitory_resident where dormitory_id=#{dormitoryId}
   </select>
 
 
