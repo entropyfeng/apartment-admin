@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 
@@ -26,7 +27,7 @@ public class OrderDormitoryController {
 
 
     @GetMapping("/apartment/university/available/dormitories")
-    public Message acquireAvailableDormitory(@RequestParam("buildingName")String buildingName,@CurrentUserAnno CurrentUser currentUser){
+    public Message acquireAvailableDormitory(@RequestParam("buildingName")String buildingName,@ApiIgnore @CurrentUserAnno CurrentUser currentUser){
         Message message=new Message();
         message.setSuccess(true);
         String username=currentUser.getUserName();
@@ -36,7 +37,7 @@ public class OrderDormitoryController {
     }
 
     @GetMapping("/apartment/university/available/campus/names")
-    public Message acquireAvailableCampusName(@CurrentUserAnno CurrentUser currentUser){
+    public Message acquireAvailableCampusName(@ApiIgnore@CurrentUserAnno CurrentUser currentUser){
       List<String> names=  orderService.filterAvailableCampusName(currentUser.getUserName());
 
       Message message=new Message();
@@ -46,7 +47,7 @@ public class OrderDormitoryController {
     }
 
     @GetMapping("/apartment/university/available/campusGroup/names")
-    public Message acquireAvailableCampusGroupName(@RequestParam("campusName")String campusName,@CurrentUserAnno CurrentUser currentUser){
+    public Message acquireAvailableCampusGroupName(@RequestParam("campusName")String campusName,@ApiIgnore@CurrentUserAnno CurrentUser currentUser){
         List<String> names=orderService.filterAvailableCampusGroup(currentUser.getUserName(),campusName);
         Message message=new Message();
         message.setSuccess(true);
@@ -54,7 +55,7 @@ public class OrderDormitoryController {
         return message;
     }
     @GetMapping("/apartment/university/available/building/names")
-    public Message acquireAvailableBuildingsName(@RequestParam("campusGroupName") String campusGroupName, @CurrentUserAnno CurrentUser currentUser){
+    public Message acquireAvailableBuildingsName(@RequestParam("campusGroupName") String campusGroupName,@ApiIgnore @CurrentUserAnno CurrentUser currentUser){
 
         List<String> names=orderService.filterAvailableBuildingName(currentUser.getUserName(),campusGroupName);
         Message message=new Message();

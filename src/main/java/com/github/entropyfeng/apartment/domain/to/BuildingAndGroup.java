@@ -6,7 +6,15 @@ public class BuildingAndGroup {
     private String buildingName;
     private String campusName;
     private String campusGroupName;
+    private Boolean hasElevator;
 
+    public Boolean getHasElevator() {
+        return hasElevator;
+    }
+
+    public void setHasElevator(Boolean hasElevator) {
+        this.hasElevator = hasElevator;
+    }
 
     public Integer getBuildingId() {
         return buildingId;
@@ -39,4 +47,6 @@ public class BuildingAndGroup {
     public void setCampusGroupName(String campusGroupName) {
         this.campusGroupName = campusGroupName;
     }
+
+
 }

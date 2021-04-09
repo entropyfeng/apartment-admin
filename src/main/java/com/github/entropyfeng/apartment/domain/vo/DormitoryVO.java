@@ -21,6 +21,8 @@ public class DormitoryVO  {
 
     private String dormitoryName;
 
+    private Boolean hasElevator;
+
     private Integer totalCapacity;
 
     private Integer currentCapacity;
@@ -50,6 +52,7 @@ public class DormitoryVO  {
         this.inGender = dormitory.getInGender().name();
         this.dormitoryDirection = dormitory.getDormitoryDirection().name();
         this.description = dormitory.getDescription();
+        this.hasElevator=buildingAndGroup.getHasElevator();
         this.createTime = dormitory.getCreateTime();
         this.updateTime = dormitory.getUpdateTime();
     }
@@ -132,6 +135,15 @@ public class DormitoryVO  {
 
     public void setDormitoryDirection(String dormitoryDirection) {
         this.dormitoryDirection = dormitoryDirection;
+    }
+
+
+    public Boolean getHasElevator() {
+        return hasElevator;
+    }
+
+    public void setHasElevator(Boolean hasElevator) {
+        this.hasElevator = hasElevator;
     }
 
     public String getDescription() {

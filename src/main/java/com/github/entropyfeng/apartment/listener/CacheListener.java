@@ -45,6 +45,6 @@ public class CacheListener implements ApplicationListener<CacheEvent> {
         colleges.forEach(college -> collegeCache.addEntry(college.getCollegeId(), college.getCollegeName()));
 
         List<BuildingAndGroup> buildingAndGroups = buildingDao.queryRelativeMap();
-        buildingAndGroups.forEach(buildingAndGroup -> campusCache.addEntry(buildingAndGroup));
+        buildingAndGroups.forEach(campusCache::addEntry);
     }
 }

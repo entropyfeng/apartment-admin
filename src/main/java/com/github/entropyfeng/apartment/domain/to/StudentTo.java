@@ -1,5 +1,7 @@
 package com.github.entropyfeng.apartment.domain.to;
 
+import com.github.entropyfeng.apartment.domain.po.Student;
+
 public class StudentTo {
 
     private String studentId;
@@ -10,6 +12,20 @@ public class StudentTo {
     private String gender;
     private String collegeName;
     private String registerYear;
+
+    public StudentTo(){
+
+    }
+    public StudentTo(Student student,String collegeName){
+        this.studentId = student.getStudentId();
+        this.studentName = student.getStudentName();
+        this.idCardNumber = student.getIdCardNumber();
+        this.email = student.getEmail();
+        this.phone =student.getPhone();
+        this.gender = student.getGender().name();
+        this.collegeName = collegeName;
+        this.registerYear = student.getRegisterYear();
+    }
 
     public StudentTo(StudentTo studentTo){
         this.studentId = studentTo.studentId;
@@ -22,9 +38,7 @@ public class StudentTo {
         this.registerYear = studentTo.registerYear;
     }
 
-    public StudentTo(){
 
-    }
     public StudentTo(String studentId, String studentName, String idCardNumber, String email, String phone, String gender, String collegeName, String registerYear) {
         this.studentId = studentId.trim();
         this.studentName = studentName.trim();

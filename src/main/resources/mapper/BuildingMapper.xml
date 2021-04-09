@@ -23,6 +23,7 @@
     <result column="campus_name" property="campusName"/>
     <result column="campus_group_name" property="campusGroupName"/>
     <result column="building_name" property="buildingName"/>
+    <result column="is_elevator" property="hasElevator"/>
   </resultMap>
 
   <sql id="baseSql">
@@ -45,7 +46,7 @@
     select <include refid="baseSql"/> from building
   </select>
     <select id="queryRelativeMap" resultMap="RelativeMapResultMap" resultType="com.github.entropyfeng.apartment.domain.to.BuildingAndGroup">
-      select building_id,campus_name,campus_group_name,building_name from campus_group, building where campus_group.campus_group_id=building.campus_group_id
+      select building_id,is_elevator,campus_name,campus_group_name,building_name from campus_group, building where campus_group.campus_group_id=building.campus_group_id
     </select>
   <select id="queryBuildingIdByBuildingName" resultType="java.lang.Integer">
     select building_id from building where building_name=#{buildingName}
@@ -63,6 +64,6 @@
   <select id="querySingleRelativeMap"
           resultMap="RelativeMapResultMap"
           resultType="com.github.entropyfeng.apartment.domain.to.BuildingAndGroup">
-    select building_id,campus_name,campus_group_name,building_name from campus_group, building where building.building_id=#{buildingId} and campus_group.campus_group_id=building.campus_group_id
+    select building_id,is_elevator,campus_name,campus_group_name,building_name from campus_group, building where building.building_id=#{buildingId} and campus_group.campus_group_id=building.campus_group_id
   </select>
 </mapper>

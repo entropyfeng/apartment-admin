@@ -10,10 +10,12 @@ import com.github.entropyfeng.apartment.service.DormitoryService;
 import com.github.entropyfeng.common.config.anno.CurrentUserAnno;
 import com.github.entropyfeng.common.domain.CurrentUser;
 import com.github.entropyfeng.common.domain.Message;
+import io.swagger.models.auth.In;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -31,7 +33,7 @@ public class DormitoryController {
         this.campusCache=campusCache;
     }
 
-
+/*
     @GetMapping("/apartment/dormitory")
     public Message acquireDormitoryByBuildingId(@Param("buildingId")Integer buildingId){
 
@@ -40,6 +42,16 @@ public class DormitoryController {
         message.setSuccess(true);
         message.addData("dormitories",dormitoryVOList);
         return message;
+    }*/
+
+    @GetMapping("/apartment/dormitory/all")
+    public Message acquireAllDormitory(){
+        Message message=new Message();
+        message.setSuccess(true);
+       List<DormitoryVO> dormitoryVOS= dormitoryService.queryAllDormitories();
+
+       message.addData("dormitories",dormitoryVOS);
+       return message;
     }
 
     @GetMapping("/apartment/dormitory")
@@ -53,6 +65,21 @@ public class DormitoryController {
        message.addData("dormitories",dormitoryList);
        return message;
     }
+
+    @GetMapping("/apartment/detail/dormitory")
+    public Message acquireDetailDormitory(@RequestParam("dormitoryId") Integer dormitoryId){
+
+
+       DetailDormitory dormitory= dormitoryService.queryDetailDormitory(dormitoryId);
+
+       Message message=new Message();
+       message.setSuccess(true);
+       message.addData("dormitory",dormitory);
+       return message;
+
+
+    }
+
     @GetMapping("/apartment/dormitory/my")
     public Message acquireMyDormitory(@ApiIgnore @CurrentUserAnno CurrentUser currentUser){
         Message message=new Message();

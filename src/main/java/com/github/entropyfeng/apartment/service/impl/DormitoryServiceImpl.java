@@ -8,10 +8,10 @@ import com.github.entropyfeng.apartment.dao.StudentDao;
 import com.github.entropyfeng.apartment.domain.DormitoryDirection;
 import com.github.entropyfeng.apartment.domain.InGender;
 import com.github.entropyfeng.apartment.domain.po.Dormitory;
-import com.github.entropyfeng.apartment.domain.po.DormitoryExample;
-import com.github.entropyfeng.apartment.domain.po.Student;
 import com.github.entropyfeng.apartment.domain.to.BuildingAndGroup;
 import com.github.entropyfeng.apartment.domain.to.DormitoryAndResident;
+import com.github.entropyfeng.apartment.domain.to.StudentResident;
+import com.github.entropyfeng.apartment.domain.to.StudentTo;
 import com.github.entropyfeng.apartment.domain.vo.DetailDormitory;
 import com.github.entropyfeng.apartment.domain.vo.DormitoryVO;
 import com.github.entropyfeng.apartment.service.ApartmentIdService;
@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.validation.constraints.NotNull;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -43,7 +44,7 @@ public class DormitoryServiceImpl implements DormitoryService {
         this.dormitoryResidentDao = dormitoryResidentDao;
         this.buildingService = buildingService;
         this.campusCache = campusCache;
-        this.studentDao=studentDao;
+        this.studentDao = studentDao;
     }
 
     private final StudentDao studentDao;
@@ -110,18 +111,32 @@ public class DormitoryServiceImpl implements DormitoryService {
         return postHandlerDormitoryList(dormitoryList);
     }
 
+    private DetailDormitory acquireDetailDormitory(Dormitory dormitory){
+        BuildingAndGroup buildingAndGroup = campusCache.getBuildingAndGroup(dormitory.getBuildingId());
+        List<DormitoryAndResident> dormitoryAndResidents = dormitoryResidentDao.queryDormitoryCurrentInfoByDormitoryId(dormitory.getDormitoryId());
+        HashMap<String, Integer> bedIdMap = new HashMap<>();
+        dormitoryAndResidents.forEach(temp -> bedIdMap.put(temp.getResidentName(), temp.getBedId()));
+        List<String> studentIdList = dormitoryAndResidents.stream().map(DormitoryAndResident::getResidentName).collect(Collectors.toList());
+
+        List<StudentTo> students = studentDao.queryStudentToByStudentIds(studentIdList);
+        List<StudentResident> studentResidents = students.stream().map(student -> new StudentResident(student, bedIdMap.get(student.getStudentId()))).collect(Collectors.toList());
+        return new DetailDormitory(dormitory, buildingAndGroup, studentResidents);
+    }
     @Override
     public DetailDormitory queryMyDormitory(String username) {
 
-        studentDao.queryStudentGenderByStudentId(username);
 
-        List<DormitoryAndResident> dormitoryAndResidents = dormitoryResidentDao.queryDormitoryCurrentInfoByResidentName(username);
+       Dormitory dormitory= dormitoryDao.queryDormitoryByResidentId(username);
 
-        List<String> studentIdList=dormitoryAndResidents.stream().map(DormitoryAndResident::getResidentName).collect(Collectors.toList());
+        return acquireDetailDormitory(dormitory);
+    }
 
-        List<Student> students= studentDao.queryStudentsByStudentIds(studentIdList);
+    @Override
+    public DetailDormitory queryDetailDormitory(Integer dormitoryId) {
 
-        return null;
+        Dormitory dormitory = dormitoryDao.queryDormitoryByDormitoryId(dormitoryId);
+
+        return acquireDetailDormitory(dormitory);
     }
 
     @Override
@@ -140,11 +155,10 @@ public class DormitoryServiceImpl implements DormitoryService {
         String campusName = dormitoryVO.getCampusName();
         String buildingName = dormitoryVO.getBuildingName();
         BuildingAndGroup buildingAndGroup = campusCache.getBuildingAndGroup(buildingName);
-        Integer buildingId=buildingAndGroup.getBuildingId();
+        Integer buildingId = buildingAndGroup.getBuildingId();
 
 
         List<Dormitory> dormitoryList = dormitoryDao.queryAllDormitory();
-
 
 
         return postHandlerDormitoryList(dormitoryList);
@@ -152,8 +166,7 @@ public class DormitoryServiceImpl implements DormitoryService {
 
     @Override
     public List<DormitoryVO> queryDormitories(Integer buildingId) {
-        DormitoryExample example = new DormitoryExample();
-        example.createCriteria().andBuildingIdEqualTo(buildingId);
+
         List<Dormitory> dormitoryList = dormitoryDao.queryDormitoryByBuildingId(buildingId);
         return postHandlerDormitoryList(dormitoryList);
 

@@ -79,6 +79,7 @@ public class InitAuthTest {
         authResourceService.addNewResource("acquireAllCampusGroup", "GET", "/apartment/campusGroup/all");
         authResourceService.addNewResource("acquireAllUser", "GET", "/auth/user/all");
         authResourceService.addNewResource("acquireAllStudent", "GET", "/university/student/all");
+        authResourceService.addNewResource("acquireAllDormitory","GET","/apartment/dormitory/all");
         authResourceService.addNewResource("insertStudentsFromExcel","POST","/university/student/excel");
         authResourceService.addNewResource("acquireDormitoryByBuildingId","GET","/apartment/dormitory");
         authResourceService.addNewResource("downloadInsertStudentTemplate","GET","/university/student/excel/template");
@@ -89,6 +90,7 @@ public class InitAuthTest {
         authRoleService.grantResourceToRole("administrator", "acquireAllCampusGroup");
         authRoleService.grantResourceToRole("administrator", "acquireAllUser");
         authRoleService.grantResourceToRole("administrator", "acquireAllStudent");
+        authRoleService.grantResourceToRole("administrator", "acquireAllDormitory");
         authRoleService.grantResourceToRole("administrator", "insertStudentsFromExcel");
         authRoleService.grantResourceToRole("administrator", "acquireDormitoryByBuildingId");
         authRoleService.grantResourceToRole("administrator","downloadInsertStudentTemplate");

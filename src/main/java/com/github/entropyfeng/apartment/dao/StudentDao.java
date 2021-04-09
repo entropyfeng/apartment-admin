@@ -4,6 +4,7 @@ package com.github.entropyfeng.apartment.dao;
 import com.github.entropyfeng.apartment.domain.Gender;
 import com.github.entropyfeng.apartment.domain.StudentAccountStatus;
 import com.github.entropyfeng.apartment.domain.po.Student;
+import com.github.entropyfeng.apartment.domain.to.StudentTo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -37,6 +38,8 @@ public interface StudentDao {
     List<Student> queryAllStudents();
 
     List<Student> queryStudentsByStudentIds(@Param("list") List<String> list);
+
+    List<StudentTo> queryStudentToByStudentIds(@Param("list") List<String> list);
 
     List<Student> queryStudentsByCollegeId(@Param("collegeId") Integer collegeId);
 
