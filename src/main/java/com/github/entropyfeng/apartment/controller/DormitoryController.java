@@ -1,17 +1,12 @@
 package com.github.entropyfeng.apartment.controller;
 
 import com.github.entropyfeng.apartment.config.cache.CampusCache;
-import com.github.entropyfeng.apartment.domain.DormitoryDirection;
-import com.github.entropyfeng.apartment.domain.InGender;
-import com.github.entropyfeng.apartment.domain.to.BuildingAndGroup;
 import com.github.entropyfeng.apartment.domain.vo.DetailDormitory;
 import com.github.entropyfeng.apartment.domain.vo.DormitoryVO;
 import com.github.entropyfeng.apartment.service.DormitoryService;
 import com.github.entropyfeng.common.config.anno.CurrentUserAnno;
 import com.github.entropyfeng.common.domain.CurrentUser;
 import com.github.entropyfeng.common.domain.Message;
-import io.swagger.models.auth.In;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,11 +21,9 @@ public class DormitoryController {
 
     private final DormitoryService dormitoryService;
 
-    private final CampusCache campusCache;
     @Autowired
     public DormitoryController(CampusCache campusCache,DormitoryService dormitoryService) {
         this.dormitoryService = dormitoryService;
-        this.campusCache=campusCache;
     }
 
 /*
