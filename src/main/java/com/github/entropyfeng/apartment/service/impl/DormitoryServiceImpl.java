@@ -27,6 +27,8 @@ import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Service
@@ -111,22 +113,26 @@ public class DormitoryServiceImpl implements DormitoryService {
         return postHandlerDormitoryList(dormitoryList);
     }
 
-    private DetailDormitory acquireDetailDormitory(Dormitory dormitory){
+    private DetailDormitory acquireDetailDormitory(Dormitory dormitory) {
         BuildingAndGroup buildingAndGroup = campusCache.getBuildingAndGroup(dormitory.getBuildingId());
         List<DormitoryAndResident> dormitoryAndResidents = dormitoryResidentDao.queryDormitoryCurrentInfoByDormitoryId(dormitory.getDormitoryId());
         HashMap<String, Integer> bedIdMap = new HashMap<>();
-        dormitoryAndResidents.forEach(temp -> bedIdMap.put(temp.getResidentName(), temp.getBedId()));
-        List<String> studentIdList = dormitoryAndResidents.stream().map(DormitoryAndResident::getResidentName).collect(Collectors.toList());
+        dormitoryAndResidents.stream().filter(Objects::nonNull).forEach(temp -> bedIdMap.put(temp.getResidentName(), temp.getBedId()));
+        List<String> studentIdList = dormitoryAndResidents.stream().filter(Objects::nonNull).map(DormitoryAndResident::getResidentName).collect(Collectors.toList());
+        List<StudentResident> studentResidents = null;
+        if (!studentIdList.isEmpty()) {
+            List<StudentTo> students = studentDao.queryStudentToByStudentIds(studentIdList);
+            studentResidents = students.stream().map(student -> new StudentResident(student, bedIdMap.get(student.getStudentId()))).collect(Collectors.toList());
+        }
 
-        List<StudentTo> students = studentDao.queryStudentToByStudentIds(studentIdList);
-        List<StudentResident> studentResidents = students.stream().map(student -> new StudentResident(student, bedIdMap.get(student.getStudentId()))).collect(Collectors.toList());
         return new DetailDormitory(dormitory, buildingAndGroup, studentResidents);
     }
+
     @Override
     public DetailDormitory queryMyDormitory(String username) {
 
 
-       Dormitory dormitory= dormitoryDao.queryDormitoryByResidentId(username);
+        Dormitory dormitory = dormitoryDao.queryDormitoryByResidentId(username);
 
         return acquireDetailDormitory(dormitory);
     }

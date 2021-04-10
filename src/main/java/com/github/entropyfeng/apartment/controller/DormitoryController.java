@@ -47,6 +47,13 @@ public class DormitoryController {
        return message;
     }
 
+    @GetMapping("/apartment/resident")
+    public Message acquireResidentStudent(@RequestParam("")Integer dormitoryId){
+
+
+        return Message.ok();
+    }
+
     @GetMapping("/apartment/dormitory")
     public Message acquireDormitory(@RequestBody DormitoryVO dormitoryVO){
 
@@ -59,11 +66,13 @@ public class DormitoryController {
        return message;
     }
 
+
+
     @GetMapping("/apartment/detail/dormitory")
-    public Message acquireDetailDormitory(@RequestParam("dormitoryId") Integer dormitoryId){
+    public Message acquireDetailDormitory(@RequestParam("dormitoryId") String dormitoryId){
 
-
-       DetailDormitory dormitory= dormitoryService.queryDetailDormitory(dormitoryId);
+       Integer number=Integer.parseInt(dormitoryId);
+       DetailDormitory dormitory= dormitoryService.queryDetailDormitory(number);
 
        Message message=new Message();
        message.setSuccess(true);
@@ -77,9 +86,14 @@ public class DormitoryController {
     public Message acquireMyDormitory(@ApiIgnore @CurrentUserAnno CurrentUser currentUser){
         Message message=new Message();
         String username=currentUser.getUserName();
-
         DetailDormitory dormitoryVO= dormitoryService.queryMyDormitory(username);
         message.setSuccess(true);
+        if (dormitoryVO==null){
+            message.addData("exist",false);
+        }else {
+            message.addData("exist",true);
+        }
+
         message.addData("dormitory",dormitoryVO);
         return message;
     }
