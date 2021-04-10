@@ -1,5 +1,6 @@
 package com.github.entropyfeng.apartment.dao;
 
+import com.github.entropyfeng.apartment.domain.po.DormitoryResident;
 import com.github.entropyfeng.apartment.domain.to.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -16,6 +17,9 @@ public interface DormitoryResidentDao {
     void insertTemplate(@Param("dormitoryId") Integer dormitoryId,@Param("bedId")Integer bedId );
 
     void insertBatchTemplate(@Param("dormitoryId")Integer dormitoryId,@Param("list") List<Integer> list);
+
+
+    List<DormitoryResident> queryAllDormitoryResident();
 
     List<ResidentAndBed> queryDormitoryCurrentInfo(@Param("dormitoryId") Integer dormitoryId);
 

@@ -1,5 +1,6 @@
 package com.github.entropyfeng.apartment.domain.to;
 
+import com.github.entropyfeng.apartment.domain.Gender;
 import com.github.entropyfeng.apartment.domain.po.Student;
 
 public class StudentTo {
@@ -13,28 +14,35 @@ public class StudentTo {
     private String collegeName;
     private String registerYear;
 
-    public StudentTo(){
+    public StudentTo() {
 
     }
-    public StudentTo(Student student,String collegeName){
+
+    public StudentTo(Student student, String collegeName) {
         this.studentId = student.getStudentId();
         this.studentName = student.getStudentName();
         this.idCardNumber = student.getIdCardNumber();
         this.email = student.getEmail();
-        this.phone =student.getPhone();
+        this.phone = student.getPhone();
         this.gender = student.getGender().name();
         this.collegeName = collegeName;
         this.registerYear = student.getRegisterYear();
     }
 
-    public StudentTo(StudentTo studentTo){
+    public StudentTo(StudentTo studentTo) {
         this.studentId = studentTo.studentId;
         this.studentName = studentTo.studentName;
         this.idCardNumber = studentTo.idCardNumber;
         this.email = studentTo.email;
-        this.phone =studentTo.phone;
-        this.gender = studentTo.gender;
-        this.collegeName = studentTo.gender;
+        this.phone = studentTo.phone;
+        this.gender=studentTo.gender;
+        try {
+            Integer number = Integer.parseInt(studentTo.gender);
+            this.gender= Gender.getInGenderByCode(number).name();
+        } catch (Exception e) {
+           //ignore
+        }
+        this.collegeName = studentTo.collegeName;
         this.registerYear = studentTo.registerYear;
     }
 

@@ -2,19 +2,19 @@ package com.github.entropyfeng.apartment.domain.to;
 
 public class DormitoryAndResident {
 
-    private String residentName;
+    private String residentId;
 
     private Integer dormitoryId;
 
     private Integer bedId;
 
 
-    public String getResidentName() {
-        return residentName;
+    public String getResidentId() {
+        return residentId;
     }
 
-    public void setResidentName(String residentName) {
-        this.residentName = residentName;
+    public void setResidentId(String residentId) {
+        this.residentId = residentId;
     }
 
     public Integer getDormitoryId() {

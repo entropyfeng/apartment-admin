@@ -41,7 +41,7 @@
                 #{inGender}, #{totalCapacity}, #{dormitoryDirection}, #{description})
     </insert>
 
-    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.github.entropyfeng.apartment.domain.po.Dormitory" useGeneratedKeys="true">
+    <insert id="insertSelective" parameterType="com.github.entropyfeng.apartment.domain.po.Dormitory" useGeneratedKeys="true">
         insert into dormitory
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="dormitoryId != null">

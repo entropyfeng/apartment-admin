@@ -34,6 +34,7 @@ public interface StudentDao {
 
     Student queryStudentByStudentId(@Param("studentId") String studentId);
 
+    List<String> queryAllStudentIds();
 
     List<Student> queryAllStudents();
 

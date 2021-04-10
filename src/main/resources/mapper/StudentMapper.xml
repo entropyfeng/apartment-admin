@@ -107,13 +107,19 @@
   <select id="queryStudentNameByStudentId" resultType="java.lang.String">
     select student_name from student where student_id=#{studentId}
   </select>
-  <select id="queryStudentToByStudentIds" resultType="com.github.entropyfeng.apartment.domain.to.StudentTo">
-    select <include refid="studentToSql"/> from student,college where  student.student_id in
+  <select id="queryStudentToByStudentIds"
+          resultMap="StudentToMap"
+          resultType="com.github.entropyfeng.apartment.domain.to.StudentTo">
+    select <include refid="studentToSql"/> from student,college where
+    student.college_id=college.college_id and student.student_id in
     <foreach collection="list"  item="id" open="(" separator="," close=")"  >
       #{id}
     </foreach>
-  and student.college_id=college.college_id
+
   </select>
+    <select id="queryAllStudentIds" resultType="java.lang.String">
+      select student_id from student
+    </select>
 
 
 </mapper>
