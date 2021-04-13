@@ -8,6 +8,7 @@ import com.github.entropyfeng.apartment.domain.AccountStatus;
 import com.github.entropyfeng.apartment.domain.po.AuthRole;
 import com.github.entropyfeng.apartment.domain.po.AuthUser;
 import com.github.entropyfeng.apartment.domain.to.PageRequest;
+import com.github.entropyfeng.apartment.domain.to.RegisterUserTo;
 import com.github.entropyfeng.apartment.exception.AuthRoleNotExistException;
 import com.github.entropyfeng.apartment.exception.AuthUserNotExistException;
 import com.github.entropyfeng.apartment.exception.DuplicateUsernameException;
@@ -21,7 +22,6 @@ import com.github.entropyfeng.common.util.JsonUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import io.jsonwebtoken.SignatureAlgorithm;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,6 +84,30 @@ public class AuthUserServiceImpl implements AuthUserService {
         authUserDao.insertBaseAuthUser(authUserId,authUsername,authPassword,email,phone, AccountStatus.COMMON);
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void batchRegisterUser(List<RegisterUserTo> registerUserTos) {
+
+        if (registerUserTos==null||registerUserTos.isEmpty()){
+            if (logger.isWarnEnabled()){
+                logger.warn("attempt to  empty batch register user ");
+            }
+            return;
+        }
+      List<AuthUser> authUsers=  registerUserTos.stream().map(to->{
+            AuthUser authUser=new AuthUser();
+            authUser.setAuthUserId(authIdService.getNextAuthUserId());
+            authUser.setAuthUsername(to.getUsername());
+            authUser.setAuthPassword(PostHandlePassword.encryptPassword(to.getPassword()));
+            authUser.setStatus(AccountStatus.COMMON);
+            authUser.setEmail(to.getEmail());
+            authUser.setPhone(to.getPhone());
+            return authUser;
+        }).collect(Collectors.toList());
+
+      authUserDao.insertBatchAuthUser(authUsers);
+
+    }
 
 
     @Override

@@ -4,6 +4,7 @@ package com.github.entropyfeng.apartment.service;
 
 import com.github.entropyfeng.apartment.domain.po.AuthUser;
 import com.github.entropyfeng.apartment.domain.to.PageRequest;
+import com.github.entropyfeng.apartment.domain.to.RegisterUserTo;
 import com.github.pagehelper.PageInfo;
 import org.springframework.lang.NonNull;
 
@@ -20,6 +21,7 @@ public interface AuthUserService {
 
     void registerUser(@NotNull String authUsername, @NotNull String authPassword, String email, String phone, boolean enablePasswordCheck) ;
 
+    void batchRegisterUser(List<RegisterUserTo> registerUserTos);
 
 
     /**

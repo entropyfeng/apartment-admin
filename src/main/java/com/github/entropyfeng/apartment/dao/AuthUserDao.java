@@ -96,5 +96,7 @@ public interface AuthUserDao {
 
     int updateByAuthUserIdSelective(@Param("authUser") AuthUser authUser);
 
-    int insertBaseAuthUser(@Param("authUserId")Long authUserId,@Param("authUserName")String authUserName,@Param("authPassword") String authPassword,@Param("email") String email,@Param("phone") String phone,@Param("status") AccountStatus accountStatus);
+    int insertBaseAuthUser(@Param("authUserId")Long authUserId,@Param("authUsername")String authUsername,@Param("authPassword") String authPassword,@Param("email") String email,@Param("phone") String phone,@Param("status") AccountStatus accountStatus);
+
+    int insertBatchAuthUser(@Param("list")List<AuthUser> list);
 }

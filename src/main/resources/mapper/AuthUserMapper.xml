@@ -191,6 +191,13 @@
 
     <insert id="insertBaseAuthUser" >
 
-        insert  into auth_user(auth_user_id, auth_username, auth_password, email, phone,auth_status) values (#{authUserId},#{authUserName},#{authPassword},#{email},#{phone},#{status})
+        insert  into auth_user(auth_user_id, auth_username, auth_password, email, phone,auth_status) values (#{authUserId},#{authUsername},#{authPassword},#{email},#{phone},#{status})
+    </insert>
+    <insert id="insertBatchAuthUser" parameterType="java.util.List">
+        insert into  auth_user(auth_user_id, auth_username, auth_password, email, phone,auth_status) values
+        <foreach collection="list" item="temp" index="index" separator=",">
+
+            (#{temp.authUserId},#{temp.authUsername},#{temp.authPassword},#{temp.email},#{temp.phone},#{temp.status})
+        </foreach>
     </insert>
 </mapper>

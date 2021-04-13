@@ -1,7 +1,6 @@
 package com.github.entropyfeng.apartment.controller;
 
 
-
 import com.github.entropyfeng.apartment.domain.po.AuthUser;
 import com.github.entropyfeng.apartment.domain.to.LoginTo;
 import com.github.entropyfeng.apartment.domain.vo.CurrentUserVo;
@@ -11,8 +10,6 @@ import com.github.entropyfeng.apartment.service.AuthUserService;
 import com.github.entropyfeng.common.config.anno.CurrentUserAnno;
 import com.github.entropyfeng.common.domain.CurrentUser;
 import com.github.entropyfeng.common.domain.Message;
-
-import io.swagger.annotations.Api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +39,6 @@ public class AccountController {
             CurrentUserVo currentUserVo = new CurrentUserVo(authUser.getAvatar(), authUser.getAuthUsername(), authUser.getAuthUserId().toString());
             currentUserVo.setAccess("admin");
             message.addData("current_user", currentUserVo);
-
             message.setSuccess(true);
         } catch (AuthUserNotExistException e) {
             logger.info("not exist {}", authUserId);
@@ -56,7 +52,6 @@ public class AccountController {
         Message message = new Message();
         Long authUserId = currentUser.getUserId();
         logger.info(userVo.toString());
-
         return Message.ok();
     }
 

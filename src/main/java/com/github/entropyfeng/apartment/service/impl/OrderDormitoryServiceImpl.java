@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -62,6 +63,9 @@ public class OrderDormitoryServiceImpl implements OrderDormitoryService {
 
 
         InGender inGender = acquireInGender(residentId);
+        if (inGender==null){
+            return new ArrayList<>();
+        }
         return campusGroupDao.queryAvailableCampusAndGroupName(campusName, inGender, InGender.MIX);
     }
 

@@ -9,6 +9,7 @@ import com.github.entropyfeng.apartment.domain.StudentStatus;
 import com.github.entropyfeng.apartment.domain.po.College;
 import com.github.entropyfeng.apartment.domain.po.Student;
 import com.github.entropyfeng.apartment.service.CollegeService;
+import com.github.entropyfeng.apartment.service.StudentService;
 import com.github.entropyfeng.apartment.service.UniversityIdService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,6 +32,9 @@ public class InitUniversityTest {
 
     @Autowired
     CollegeDao collegeDao;
+
+    @Autowired
+    StudentService studentService;
 
     @Autowired
     UniversityIdService idService;

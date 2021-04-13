@@ -132,4 +132,6 @@ public class AuthUser implements Serializable {
     public void setAvatar(String avatar) {
         this.avatar = avatar;
     }
+
+
 }

@@ -8,12 +8,16 @@ import com.github.entropyfeng.apartment.domain.StudentAccountStatus;
 import com.github.entropyfeng.apartment.domain.excel.StudentExcel;
 import com.github.entropyfeng.apartment.domain.excel.StudentExcelListener;
 import com.github.entropyfeng.apartment.domain.po.Student;
+import com.github.entropyfeng.apartment.domain.to.RegisterUserTo;
 import com.github.entropyfeng.apartment.domain.to.StudentTo;
 import com.github.entropyfeng.apartment.domain.vo.StudentVO;
 import com.github.entropyfeng.apartment.service.AuthUserService;
 import com.github.entropyfeng.apartment.service.StudentService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -24,24 +28,41 @@ import java.util.stream.Collectors;
 @Service
 public class StudentServiceImpl implements StudentService {
 
-    @Autowired
+    final
     StudentDao studentDao;
 
-    @Autowired
+    final
     CollegeCache collegeCache;
-    @Autowired
+    final
     AuthUserService authUserService;
 
+    private static final Logger logger = LoggerFactory.getLogger(StudentServiceImpl.class);
+
+    @Autowired
+    public StudentServiceImpl(StudentDao studentDao, CollegeCache collegeCache, AuthUserService authUserService) {
+        this.studentDao = studentDao;
+        this.collegeCache = collegeCache;
+        this.authUserService = authUserService;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void createAccountForAllNonAccountStudent() {
 
         List<Student> students = studentDao.queryAllStudents();
-
-
         List<Student> noAccountStudents = students.stream().filter(student -> student.getStudentAccountStatus().equals(StudentAccountStatus.NOT_EXIST)).collect(Collectors.toList());
 
+        List<RegisterUserTo> registerUserTos = noAccountStudents.stream().map(student -> {
+            RegisterUserTo registerUserTo = new RegisterUserTo();
+            registerUserTo.setEmail(student.getEmail());
+            registerUserTo.setPhone(student.getPhone());
+            registerUserTo.setUsername(student.getStudentId());
+            registerUserTo.setPassword(student.getStudentId());
+            return registerUserTo;
+        }).collect(Collectors.toList());
+
+        authUserService.batchRegisterUser(registerUserTos);
         noAccountStudents.forEach(student -> {
-            authUserService.registerUser(student.getUsername(), student.getUsername(), student.getEmail(), student.getPhone(), false);
             studentDao.updateAccountStatus(student.getStudentId(), StudentAccountStatus.EXIST);
         });
 

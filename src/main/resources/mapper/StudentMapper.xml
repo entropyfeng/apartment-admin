@@ -49,13 +49,14 @@
   <insert id="insertBatchStudent" parameterType="java.util.List">
     insert into student (student_id, student_name, id_card_number, college_id, gender, acc_status,
                          student_status, email, phone, register_year, student_description)
-
+    values
     <foreach collection="list" item="student" index="index" separator=",">
 
       (#{student.studentId},#{student.studentName},#{student.idCardNumber},
       #{student.collegeId},#{student.gender},
       #{student.accStatus},#{student.studentStatus},
-      #{student.email},#{student.phone},#{student.registerYear},#{student.description}) </foreach>
+      #{student.email},#{student.phone},#{student.registerYear},#{student.description})
+    </foreach>
 
   </insert>
 
