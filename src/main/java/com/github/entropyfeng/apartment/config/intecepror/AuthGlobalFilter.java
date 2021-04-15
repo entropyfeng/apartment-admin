@@ -97,6 +97,21 @@ public class AuthGlobalFilter implements HandlerInterceptor {
         if (jwtAccount != null) {
             res = authService.checkPerm(jwtAccount.getRoles(), method, path);
         }
+        if (!res){
+            Message message=new Message();
+            message.setSuccess(false);
+            message.setErrorMessage("无权限");
+            String jsonString = null;
+            try {
+                jsonString = MessageUtil.toJsonString(message);
+                response.getWriter().write(jsonString);
+            } catch (IOException e) {
+                if (logger.isWarnEnabled()) {
+                    logger.warn("write {} track IO Exception {}", jsonString, e.getMessage());
+                }
+            }
+            response.setStatus(401);
+        }
         return res;
     }
 

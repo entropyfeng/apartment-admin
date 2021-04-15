@@ -38,7 +38,7 @@ public class MvcConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(authGlobalFilter).excludePathPatterns("/account/login")
                 .excludePathPatterns("/swagger-ui.html")
-                .addPathPatterns("/webjars/**")
+                //.addPathPatterns("/webjars/**")
                 .excludePathPatterns("/v2/api-docs");
 
     }

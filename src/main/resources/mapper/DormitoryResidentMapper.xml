@@ -15,7 +15,7 @@
   </resultMap>
   <resultMap id="ResidentBedVersionMap" type="com.github.entropyfeng.apartment.domain.to.ResidentBedVersion">
 
-    <id column="resident_id" property="residentName"/>
+    <id column="resident_id" property="residentId"/>
     <result column="bed_id" property="bedId"/>
     <result column="version" property="version"/>
   </resultMap>
@@ -53,10 +53,15 @@
 
 
   <update id="updateDormitoryResidentRelyVersion">
-    update dormitory_resident set resident_id=#{residentName} , version=version+1 where dormitory_id=#{dormitoryId} and version=#{version} and bed_id=#{bedId}
+    update dormitory_resident set resident_id=#{residentId} , version=version+1 where dormitory_id=#{dormitoryId} and version=#{version} and bed_id=#{bedId}
   </update>
   <update id="updateQuitDormitory">
-    update dormitory_resident set resident_id=null,version=version+1 where dormitory_id=#{dormitoryId} and resident_id=#{residentName} and version=#{version}
+    update dormitory_resident set resident_id=null,version=version+1 where dormitory_id=#{dormitoryId} and resident_id=#{residentId} and version=#{version}
+  </update>
+  <update id="updateQuitDormitoryRelyDoubleVersion">
+    update dormitory_resident ,dormitory set resident_id=null,dormitory_resident.version=dormitory_resident.version+1
+where resident_id=#{residentId} and dormitory.version=#{dormitoryVersion}
+and dormitory_resident.version=#{residentVersion}
   </update>
 
   <select id="queryDormitoryCurrentInfo"
@@ -84,7 +89,7 @@
 
   </select>
   <select id="querySingleResidentStatus" resultType="java.lang.Boolean">
-    select count(dormitory_id) from dormitory_resident where resident_id=#{residentName}
+    select 1 from dormitory_resident where resident_id=#{residentId}
   </select>
   <select id="queryAvailableBed" resultType="java.lang.Integer">
     select bed_id from dormitory_resident where dormitory_id=#{dormitoryId} and resident_id IS NULL
@@ -93,19 +98,19 @@
           resultMap="DormitoryIdAndVersionMap"
           resultType="com.github.entropyfeng.apartment.domain.to.DormitoryIdAndVersion">
 
-    select dormitory_id ,version from dormitory_resident where resident_id=#{residentName}
+    select dormitory_id ,version from dormitory_resident where resident_id=#{residentId}
   </select>
     <select id="queryCurrentInPerson" resultType="java.lang.String">
       select resident_id from dormitory_resident where dormitory_id=#{dormitoryId}
     </select>
   <select id="queryCurrentBedInfoByResidentName"
           resultType="java.lang.String">
-    select resident_id from dormitory_resident where dormitory_id=(select dormitory_id from dormitory_resident where resident_id=#{residentName})
+    select resident_id from dormitory_resident where dormitory_id=(select dormitory_id from dormitory_resident where resident_id=#{residentId})
   </select>
   <select id="queryDormitoryCurrentInfoByResidentName"
           resultMap="DormitoryAndResidentMap"
           resultType="com.github.entropyfeng.apartment.domain.to.DormitoryAndResident">
-    select resident_id,dormitory_id,bed_id from dormitory_resident where dormitory_id in (select dormitory_id from dormitory_resident where resident_id=#{residentName})
+    select resident_id,dormitory_id,bed_id from dormitory_resident where dormitory_id in (select dormitory_id from dormitory_resident where resident_id=#{residentId})
 
   </select>
   <select id="queryDormitoryCurrentInfoByDormitoryId"
@@ -118,6 +123,11 @@
           resultMap="BaseResultMap"
           resultType="com.github.entropyfeng.apartment.domain.po.DormitoryResident">
     select <include refid="BaseSql"/> from dormitory_resident
+  </select>
+  <select id="queryDormitoryResidentByResidentId"
+          resultMap="BaseResultMap"
+          resultType="com.github.entropyfeng.apartment.domain.po.DormitoryResident">
+    select <include refid="BaseSql"/> from dormitory_resident where resident_id=#{residentId}
   </select>
 
 

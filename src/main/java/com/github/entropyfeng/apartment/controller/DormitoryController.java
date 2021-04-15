@@ -69,10 +69,10 @@ public class DormitoryController {
 
 
     @GetMapping("/apartment/detail/dormitory")
-    public Message acquireDetailDormitory(@RequestParam("dormitoryId") String dormitoryId){
+    public Message acquireDetailDormitory(@ApiIgnore@CurrentUserAnno CurrentUser currentUser,@RequestParam("dormitoryId") String dormitoryId){
 
        Integer number=Integer.parseInt(dormitoryId);
-       DetailDormitory dormitory= dormitoryService.queryDetailDormitory(number);
+       DetailDormitory dormitory= dormitoryService.queryDetailDormitory(number,currentUser.getRoles());
 
        Message message=new Message();
        message.setSuccess(true);
@@ -87,14 +87,15 @@ public class DormitoryController {
         Message message=new Message();
         String username=currentUser.getUserName();
         DetailDormitory dormitoryVO= dormitoryService.queryMyDormitory(username);
+
         message.setSuccess(true);
         if (dormitoryVO==null){
             message.addData("exist",false);
         }else {
+            message.addData("dormitory",dormitoryVO);
             message.addData("exist",true);
         }
 
-        message.addData("dormitory",dormitoryVO);
         return message;
     }
 }

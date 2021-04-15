@@ -62,9 +62,11 @@ public class InitAuthTest {
         clearAll();
         authUserService.registerUser("admin", "admin", "11@$$.com", "mock0", false);
 
-
+        long beforeCreateAccount= System.currentTimeMillis();
         studentService.createAccountForAllNonAccountStudent();
-
+        long afterCreateAccount=System.currentTimeMillis();
+        String xx= String.format("cause  %s second to create account ",(afterCreateAccount-beforeCreateAccount)/1000.0);
+        System.out.println(xx);
 
         authRoleService.addAuthRole("administrator");
         authRoleService.addAuthRole("student");
@@ -88,6 +90,10 @@ public class InitAuthTest {
         authResourceService.addNewResource("acquireAvailableCampusNames","GET","/apartment/university/available/campus/names");
         authResourceService.addNewResource("acquireAvailableCampusGroupNames","GET","/apartment/university/available/campusGroup/names");
         authResourceService.addNewResource("acquireAvailableBuildingNames","GET","/apartment/university/available/building/names");
+        authResourceService.addNewResource("acquireAvailableDormitory","GET","/apartment/university/available/dormitories");
+        authResourceService.addNewResource("checkInMyDormitory","POST","/apartment/my/checkIn");
+        authResourceService.addNewResource("checkOutMyDormitory","POST","/apartment/my/checkOut");
+
 
 
         authRoleService.grantResourceToRole("administrator", "acquireCurrentUser");
@@ -105,6 +111,7 @@ public class InitAuthTest {
         authRoleService.grantResourceToRole("administrator","acquireAvailableCampusNames");
         authRoleService.grantResourceToRole("administrator","acquireAvailableCampusGroupNames");
         authRoleService.grantResourceToRole("administrator","acquireAvailableBuildingNames");
+        authRoleService.grantResourceToRole("administrator","acquireAvailableDormitory");
 
 
         authRoleService.grantResourceToRole("student", "acquireCurrentUser");
@@ -112,7 +119,11 @@ public class InitAuthTest {
         authRoleService.grantResourceToRole("student","acquireAvailableCampusNames");
         authRoleService.grantResourceToRole("student","acquireAvailableCampusGroupNames");
         authRoleService.grantResourceToRole("student","acquireAvailableBuildingNames");
-
+        authRoleService.grantResourceToRole("student","acquireAvailableDormitory");
+        authRoleService.grantResourceToRole("student","acquireDetailDormitory");
+        authRoleService.grantResourceToRole("student","checkInMyDormitory");
+        authRoleService.grantResourceToRole("student","checkOutMyDormitory");
     }
+
 
 }

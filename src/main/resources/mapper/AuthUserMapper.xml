@@ -123,6 +123,9 @@
             #{name}
         </foreach>
     </select>
+    <select id="queryRoleNameByUserId" resultType="java.lang.String">
+        select auth_role.auth_role_name from auth_role,auth_user_role where auth_user_role.auth_user_id=#{authUserId} and auth_user_role.auth_role_id=auth_role.auth_role_id
+    </select>
     <delete id="deleteBatchUsers">
         delete from auth_user where auth_user_id in
         <foreach collection="list" item="id" open="(" separator="," close=")">

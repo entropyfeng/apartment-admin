@@ -2,9 +2,11 @@ package com.github.entropyfeng.apartment;
 
 import com.github.entropyfeng.apartment.dao.*;
 import com.github.entropyfeng.apartment.domain.DormitoryDirection;
+import com.github.entropyfeng.apartment.domain.Gender;
 import com.github.entropyfeng.apartment.domain.InGender;
 import com.github.entropyfeng.apartment.domain.builder.BuildingVOBuilder;
 import com.github.entropyfeng.apartment.domain.builder.DormitoryVOBuilder;
+import com.github.entropyfeng.apartment.domain.helper.GenderHelper;
 import com.github.entropyfeng.apartment.domain.po.*;
 import com.github.entropyfeng.apartment.domain.vo.BuildingVO;
 import com.github.entropyfeng.apartment.domain.vo.DormitoryVO;
@@ -57,7 +59,7 @@ public class InitApartmentTest {
     @Autowired
     DormitoryResidentDao residentDao;
 
-    private ThreadLocalRandom random = ThreadLocalRandom.current();
+    private final ThreadLocalRandom random = ThreadLocalRandom.current();
 
     private void clearAll() {
         idService.clearAllIds();
@@ -143,22 +145,29 @@ public class InitApartmentTest {
         dormitoryDao.queryAllDormitory().forEach(dormitory -> {
             List<Integer> integers = IntStream.range(0, dormitory.getTotalCapacity()).boxed().collect(Collectors.toList());
             residentDao.insertBatchTemplate(dormitory.getDormitoryId(), integers);
-
         });
 
     }
 
     private void buildResident() {
 
-        List<String> strings = studentDao.queryAllStudentIds();
+
+        List<Student> students=studentDao.queryAllStudents();
         List<DormitoryResident> residents = residentDao.queryAllDormitoryResident();
         residents = residents.stream().filter(temp -> temp.getResidentId() == null).collect(Collectors.toList());
-        int minSize = Math.min(strings.size(), residents.size());
+        int minSize = Math.min(students.size(), residents.size());
         for (int i = 0; i < minSize; i++) {
 
             DormitoryResident resident = residents.get(i);
-            int res= residentDao.updateDormitoryResidentRelyVersion(resident.getDormitoryId(), resident.getBedId(), strings.get(i), resident.getVersion());
-            System.out.println(res);
+            Dormitory dormitory= dormitoryDao.queryDormitoryByDormitoryId(resident.getDormitoryId());
+            Student student=students.get(i);
+
+            if (dormitory.getInGender().equals(InGender.MIX)|| GenderHelper.toGender(dormitory.getInGender()).equals(student.getGender())){
+                int res= residentDao.updateDormitoryResidentRelyVersion(resident.getDormitoryId(), resident.getBedId(), student.getStudentId(), resident.getVersion());
+                if (res==1){
+                    dormitoryDao.updateCurrentCapacityRelyVersion(dormitory.getDormitoryId(),dormitory.getCurrentCapacity()+1,dormitory.getVersion());
+                }
+            }
         }
 
 

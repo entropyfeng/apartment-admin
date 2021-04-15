@@ -3,6 +3,7 @@ package com.github.entropyfeng.apartment.dao;
 import com.github.entropyfeng.apartment.domain.DormitoryDirection;
 import com.github.entropyfeng.apartment.domain.InGender;
 import com.github.entropyfeng.apartment.domain.po.Dormitory;
+import io.swagger.models.auth.In;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -45,5 +46,8 @@ public interface DormitoryDao {
     Dormitory filterDormitoryByGender(@Param("inGender") InGender inGender);
 
     Integer updateCurrentCapacityRelyVersion(@Param("dormitoryId") Integer dormitoryId,@Param("currentCapacity")Integer currentCapacity,@Param("version")Long version);
+
+    Integer updateCurrentCapacityRelyDoubleVersion(@Param("dormitoryId")Integer dormitoryId,@Param("currentCapacity")Integer currentCapacity,@Param("residentVersion")Long residentVersion,@Param("dormitoryVersion")Long dormitoryVersion);
+
 
 }

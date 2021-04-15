@@ -58,6 +58,8 @@ public interface AuthUserService {
 
     AuthUser getAuthUserById(Long authUserId) ;
 
+    List<String> getAuthRoleNameById(Long authUserId);
+
     Long getAuthUserIdByName(String authUserName) ;
 
     List<AuthUser> allAuthUser();

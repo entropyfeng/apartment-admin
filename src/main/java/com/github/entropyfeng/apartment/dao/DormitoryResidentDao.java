@@ -5,6 +5,7 @@ import com.github.entropyfeng.apartment.domain.to.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.List;
 
@@ -21,18 +22,22 @@ public interface DormitoryResidentDao {
 
     List<DormitoryResident> queryAllDormitoryResident();
 
+    DormitoryResident queryDormitoryResidentByResidentId(@Param("residentId")String residentId);
+
     List<ResidentAndBed> queryDormitoryCurrentInfo(@Param("dormitoryId") Integer dormitoryId);
 
-    List<DormitoryAndResident> queryDormitoryCurrentInfoByResidentName(@Param("residentName") String residentName);
+    List<DormitoryAndResident> queryDormitoryCurrentInfoByResidentName(@Param("residentId") String residentId);
 
     List<DormitoryAndResident> queryDormitoryCurrentInfoByDormitoryId(@Param("dormitoryId")Integer dormitoryId);
 
 
-    List<String> queryCurrentBedInfoByResidentName(@Param("residentName") String residentName);
+    List<String> queryCurrentBedInfoByResidentName(@Param("residentId") String residentId);
 
-    Integer updateDormitoryResidentRelyVersion(@Param("dormitoryId") Integer dormitoryId, @Param("bedId") Integer bedId, @Param("residentName") String residentName, @Param("version") Long version);
+    Integer updateDormitoryResidentRelyVersion(@Param("dormitoryId") Integer dormitoryId, @Param("bedId") Integer bedId, @Param("residentId") String residentId, @Param("version") Long version);
 
-    Integer updateQuitDormitory(@Param("dormitoryId") Integer dormitoryId,  @Param("residentName") String residentName,@Param("version")Long version);
+    Integer updateQuitDormitory(@Param("dormitoryId") Integer dormitoryId,  @Param("residentId") String residentId,@Param("version")Long version);
+
+    Integer updateQuitDormitoryRelyDoubleVersion(@Param("dormitoryId") Integer dormitoryId,  @Param("residentId") String residentId,@Param("dormitoryVersion")Long dormitoryVersion,@Param("residentVersion")Long residentVersion);
 
     Integer queryResidentCount(@Param("dormitoryId") Integer dormitoryId);
 
@@ -41,10 +46,10 @@ public interface DormitoryResidentDao {
     List<Integer> queryAvailableBed(@Param("dormitoryId") Integer dormitoryId);
 
     List<String> queryCurrentInPerson(@Param("dormitoryId")Integer dormitoryId);
-    Boolean querySingleResidentStatus(@Param("residentName") String residentName);
+    Boolean querySingleResidentStatus(@Param("residentId") String residentId);
 
     ResidentBedVersion queryCurrentBedInfo(@Param("dormitoryId") Integer dormitoryId, @Param("bedId") Integer bedId);
 
-    DormitoryIdAndVersion queryIdAndVersionByResidentName(@Param("residentName")String residentName);
+    DormitoryIdAndVersion queryIdAndVersionByResidentName(@Param("residentId")String residentId);
 
 }

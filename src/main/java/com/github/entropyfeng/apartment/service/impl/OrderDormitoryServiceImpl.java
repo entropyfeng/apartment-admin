@@ -4,13 +4,16 @@ import com.github.entropyfeng.apartment.dao.*;
 import com.github.entropyfeng.apartment.domain.Gender;
 import com.github.entropyfeng.apartment.domain.InGender;
 import com.github.entropyfeng.apartment.domain.po.Dormitory;
+import com.github.entropyfeng.apartment.domain.po.DormitoryResident;
 import com.github.entropyfeng.apartment.domain.to.BuildingAndGroup;
-import com.github.entropyfeng.apartment.domain.to.DormitoryIdAndVersion;
 import com.github.entropyfeng.apartment.domain.to.ResidentBedVersion;
 import com.github.entropyfeng.apartment.domain.vo.DormitoryVO;
+import com.github.entropyfeng.apartment.exception.AlreadyCheckInException;
 import com.github.entropyfeng.apartment.exception.BusinessParaException;
 import com.github.entropyfeng.apartment.service.BuildingService;
 import com.github.entropyfeng.apartment.service.OrderDormitoryService;
+import com.github.entropyfeng.common.code.ErrorCode;
+import com.github.entropyfeng.common.exception.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +49,7 @@ public class OrderDormitoryServiceImpl implements OrderDormitoryService {
     public OrderDormitoryServiceImpl(StudentDao studentDao, BuildingService buildingService, CampusGroupDao campusGroupDao, CampusDao campusDao, BuildingDao buildingDao, DormitoryDao dormitoryDao, DormitoryResidentDao dormitoryResidentDao) {
         this.campusGroupDao = campusGroupDao;
         this.campusDao = campusDao;
-        this.studentDao=studentDao;
+        this.studentDao = studentDao;
         this.buildingDao = buildingDao;
         this.dormitoryDao = dormitoryDao;
         this.dormitoryResidentDao = dormitoryResidentDao;
@@ -63,7 +66,7 @@ public class OrderDormitoryServiceImpl implements OrderDormitoryService {
 
 
         InGender inGender = acquireInGender(residentId);
-        if (inGender==null){
+        if (inGender == null) {
             return new ArrayList<>();
         }
         return campusGroupDao.queryAvailableCampusAndGroupName(campusName, inGender, InGender.MIX);
@@ -92,87 +95,79 @@ public class OrderDormitoryServiceImpl implements OrderDormitoryService {
 
     /**
      * 预定寝室
-     *
      * @param residentId  用户名
      * @param dormitoryId 寝室Id
      * @param bedId       床位号
-     * @return true->预定成功; false->预定失败
      */
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Boolean checkInDormitory(@NotNull String residentId, @NotNull Integer dormitoryId, @NotNull Integer bedId) {
+    public void checkInDormitory(@NotNull String residentId, @NotNull Integer dormitoryId, @NotNull Integer bedId) throws AlreadyCheckInException {
 
-        Boolean inDormitory = dormitoryResidentDao.querySingleResidentStatus(residentId);
-        if (inDormitory) {
-            return Boolean.FALSE;
+        DormitoryResident resident = dormitoryResidentDao.queryDormitoryResidentByResidentId(residentId);
+        if (resident != null) {
+            if (logger.isWarnEnabled()) {
+                logger.warn("resident -> residentId {} already check in", residentId);
+            }
+            throw new BusinessException(residentId + "已经存在住宿信息", ErrorCode.REQUEST_PARA_ERROR);
         }
         Dormitory dormitory = dormitoryDao.queryDormitoryByDormitoryId(dormitoryId);
-        if (dormitory != null) {
-            Integer currentCapacity = dormitory.getCurrentCapacity();
-            if (currentCapacity < dormitory.getTotalCapacity()) {
-                ResidentBedVersion residentBedVersion = dormitoryResidentDao.queryCurrentBedInfo(dormitoryId, bedId);
-                String currentResidentName = residentBedVersion.getResidentName();
-                if (currentResidentName == null) {
-                    Long residentVersion = residentBedVersion.getVersion();
-                    Integer count = dormitoryResidentDao.updateDormitoryResidentRelyVersion(dormitoryId, bedId, residentId, residentVersion);
-                    if (count.equals(1)) {
+        if (dormitory == null) {
+            if (logger.isWarnEnabled()) {
+                logger.warn("dormitory's dormitoryId {} not exist", dormitoryId);
+            }
+            throw new BusinessParaException("dormitory's dormitoryId ->" + dormitoryId + " not exist");
+        }
 
-                        Long dormitoryVersion = dormitory.getVersion();
-                        Integer dormitoryCount = dormitoryDao.updateCurrentCapacityRelyVersion(dormitoryId, currentCapacity + 1, dormitoryVersion);
 
-                        if (dormitoryCount.equals(1)) {
-                            return Boolean.TRUE;
-                        }
+        Integer currentCapacity = dormitory.getCurrentCapacity();
+        if (currentCapacity < dormitory.getTotalCapacity()) {
+                /*
+                  创建时生成skeleton,一定不为null
+                 */
+            ResidentBedVersion residentBedVersion = dormitoryResidentDao.queryCurrentBedInfo(dormitoryId, bedId);
+            String currentResidentId = residentBedVersion.getResidentId();
+            if (currentResidentId == null) {
+                Long residentVersion = residentBedVersion.getVersion();
 
-                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                Integer count = dormitoryResidentDao.updateDormitoryResidentRelyVersion(dormitoryId, bedId, residentId, residentVersion);
+                if (count.equals(1)) {
+                    Long dormitoryVersion = dormitory.getVersion();
+                    Integer dormitoryCount = dormitoryDao.updateCurrentCapacityRelyVersion(dormitoryId, currentCapacity + 1, dormitoryVersion);
+                    if (dormitoryCount.equals(1)) {
+                        return;
                     }
                 }
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             }
         }
 
-        return Boolean.FALSE;
-    }
 
-    @Override
-    public Boolean checkInDormitory(@NotNull String residentId, @NotNull Integer dormitoryId) {
-
-        List<Integer> bedIdList = dormitoryResidentDao.queryAvailableBed(dormitoryId);
-
-        boolean res;
-        for (Integer bedId : bedIdList) {
-
-            res = checkInDormitory(residentId, dormitoryId, bedId);
-            if (res) {
-                return true;
-            }
-        }
-        return false;
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Boolean quitDormitory(@NotNull String residentId) {
+    public void checkOutDormitory(@NotNull String residentId) {
 
-
-        DormitoryIdAndVersion dormitoryIdAndVersion = dormitoryResidentDao.queryIdAndVersionByResidentName(residentId);
-
-        Integer dormitoryId = dormitoryIdAndVersion.getDormitoryId();
-        Dormitory dormitory = dormitoryDao.queryDormitoryByDormitoryId(dormitoryId);
-        Integer currentCapacity = dormitory.getCurrentCapacity();
-        if (currentCapacity <= 0) {
-            return false;
+        Dormitory dormitory = dormitoryDao.queryDormitoryByResidentId(residentId);
+        if (dormitory == null) {
+            throw new BusinessException("residentId :" + residentId + " not check in", ErrorCode.REQUEST_PARA_ERROR);
         }
-        Integer residentCount = dormitoryResidentDao.updateQuitDormitory(dormitoryId, residentId, dormitoryIdAndVersion.getVersion());
-        if (residentCount == 1) {
-            Integer dormitoryCount = dormitoryDao.updateCurrentCapacityRelyVersion(dormitoryId, currentCapacity - 1, dormitory.getVersion());
+        boolean safe = checkIsLegalCapacity(dormitory.getTotalCapacity(), dormitory.getCurrentCapacity());
+        if (!safe) {
+            logger.error("dataBase integrity break in check dormitory Capacity ,current residentId is {}", residentId);
+        }
 
-            if (dormitoryCount == 1) {
-                return true;
+        DormitoryResident resident = dormitoryResidentDao.queryDormitoryResidentByResidentId(residentId);
+
+        if (resident.getDormitoryId().equals(dormitory.getDormitoryId())) {
+            Integer res1 = dormitoryDao.updateCurrentCapacityRelyDoubleVersion(dormitory.getDormitoryId(), dormitory.getCurrentCapacity() - 1, resident.getVersion(), dormitory.getVersion());
+            Integer res2 = dormitoryResidentDao.updateQuitDormitoryRelyDoubleVersion(dormitory.getDormitoryId(), residentId, dormitory.getVersion() + 1, resident.getVersion());
+            if (res1.equals(1) && res1.equals(res2)) {
+                return;
             }
-
         }
-        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-        return false;
+
+        throw new BusinessException("业务繁忙，请刷新重试", ErrorCode.REQUEST_PARA_ERROR);
     }
 
 
@@ -203,5 +198,10 @@ public class OrderDormitoryServiceImpl implements OrderDormitoryService {
             }
         }
         return inGender;
+    }
+
+    private static boolean checkIsLegalCapacity(int maxCapacity, int currentCapacity) {
+
+        return currentCapacity <= maxCapacity && currentCapacity >= 0;
     }
 }

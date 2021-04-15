@@ -7,6 +7,9 @@ public class StudentResident extends StudentTo {
         super(studentTo);
         this.bedId=bedId;
     }
+    public StudentResident(Integer bedId){
+        this.bedId=bedId;
+    }
     private Integer bedId;
 
     public Integer getBedId() {

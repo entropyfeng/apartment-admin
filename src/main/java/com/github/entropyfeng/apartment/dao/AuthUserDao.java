@@ -88,6 +88,9 @@ public interface AuthUserDao {
     void updatePasswordByName(@Param("authUsername")String authUsername,@Param("authPassword") String authPassword);
 
 
+    List<String> queryRoleNameByUserId(@Param("authUserId")Long authUserId);
+
+
     List<AuthUser> queryAllUsersByPage(PageRequest pageRequest);
 
     List<AuthUser> queryAuthUserByUsernames(@Param("list") List<String> list);

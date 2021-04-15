@@ -2,18 +2,18 @@ package com.github.entropyfeng.apartment.domain.to;
 
 public class ResidentBedVersion {
 
-    private String residentName;
+    private String residentId;
 
     private Integer bedId;
 
     private Long version;
 
-    public String getResidentName() {
-        return residentName;
+    public String getResidentId() {
+        return residentId;
     }
 
-    public void setResidentName(String residentName) {
-        this.residentName = residentName;
+    public void setResidentId(String residentId) {
+        this.residentId = residentId;
     }
 
     public Integer getBedId() {
@@ -23,7 +23,6 @@ public class ResidentBedVersion {
     public void setBedId(Integer bedId) {
         this.bedId = bedId;
     }
-
 
     public Long getVersion() {
         return version;

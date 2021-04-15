@@ -13,7 +13,7 @@ public interface DormitoryService {
     List<DormitoryVO> queryAllDormitories();
 
     DetailDormitory queryMyDormitory(String username);
-    DetailDormitory queryDetailDormitory(Integer dormitoryId);
+    DetailDormitory queryDetailDormitory(Integer dormitoryId,List<String> roleList);
     List<DormitoryVO> queryDormitory(DormitoryVO simpleDormitoryVO);
     List<DormitoryVO> queryDormitories(Integer buildingId);
     DormitoryVO queryDormitory(@NotNull Integer dormitoryId);

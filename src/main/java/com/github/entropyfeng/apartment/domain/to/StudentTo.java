@@ -30,6 +30,9 @@ public class StudentTo {
     }
 
     public StudentTo(StudentTo studentTo) {
+        if (studentTo==null){
+            return;
+        }
         this.studentId = studentTo.studentId;
         this.studentName = studentTo.studentName;
         this.idCardNumber = studentTo.idCardNumber;

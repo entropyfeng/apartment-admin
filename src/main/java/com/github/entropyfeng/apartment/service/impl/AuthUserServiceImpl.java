@@ -80,22 +80,22 @@ public class AuthUserServiceImpl implements AuthUserService {
         }
 
         authPassword = PostHandlePassword.encryptPassword(authPassword);
-        Long authUserId=authIdService.getNextAuthUserId();
-        authUserDao.insertBaseAuthUser(authUserId,authUsername,authPassword,email,phone, AccountStatus.COMMON);
+        Long authUserId = authIdService.getNextAuthUserId();
+        authUserDao.insertBaseAuthUser(authUserId, authUsername, authPassword, email, phone, AccountStatus.COMMON);
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void batchRegisterUser(List<RegisterUserTo> registerUserTos) {
 
-        if (registerUserTos==null||registerUserTos.isEmpty()){
-            if (logger.isWarnEnabled()){
+        if (registerUserTos == null || registerUserTos.isEmpty()) {
+            if (logger.isWarnEnabled()) {
                 logger.warn("attempt to  empty batch register user ");
             }
             return;
         }
-      List<AuthUser> authUsers=  registerUserTos.stream().map(to->{
-            AuthUser authUser=new AuthUser();
+        List<AuthUser> authUsers = registerUserTos.stream().map(to -> {
+            AuthUser authUser = new AuthUser();
             authUser.setAuthUserId(authIdService.getNextAuthUserId());
             authUser.setAuthUsername(to.getUsername());
             authUser.setAuthPassword(PostHandlePassword.encryptPassword(to.getPassword()));
@@ -105,13 +105,13 @@ public class AuthUserServiceImpl implements AuthUserService {
             return authUser;
         }).collect(Collectors.toList());
 
-      authUserDao.insertBatchAuthUser(authUsers);
+        authUserDao.insertBatchAuthUser(authUsers);
 
     }
 
 
     @Override
-    public void grantRoleToUser(String authUserName, String authRoleName)  {
+    public void grantRoleToUser(String authUserName, String authRoleName) {
         Long userId = authUserDao.queryAuthUserIdByUsername(authUserName);
         Long roleId;
 
@@ -159,13 +159,13 @@ public class AuthUserServiceImpl implements AuthUserService {
     }
 
     @Override
-    public String userLogin(@NotNull String authUsername, @NotNull String authPassword)  {
+    public String userLogin(@NotNull String authUsername, @NotNull String authPassword) {
         AuthUser authUser = authUserDao.queryAuthUserByAuthUsername(authUsername);
         if (authUser == null) {
             throw new AuthUserNotExistException();
         }
 
-        if (authUser.getAuthPassword()==null||!authPassword.equals(authUser.getAuthPassword())) {
+        if (authUser.getAuthPassword() == null || !authPassword.equals(authUser.getAuthPassword())) {
             throw new PasswordErrorException();
         }
         Long userId = authUser.getAuthUserId();
@@ -211,7 +211,7 @@ public class AuthUserServiceImpl implements AuthUserService {
     @Override
     public void batchDeleteUsers(List<String> toDeleteUserNames) {
 
-        if (toDeleteUserNames.isEmpty()){
+        if (toDeleteUserNames.isEmpty()) {
             return;
         }
         authUserDao.deleteBatchUsersByUsernames(toDeleteUserNames);
@@ -240,39 +240,38 @@ public class AuthUserServiceImpl implements AuthUserService {
 
 
         if (authUser == null) {
-            logger.warn("username {} not exist in reset password",authUsername);
+            logger.warn("username {} not exist in reset password", authUsername);
             throw new AuthUserNotExistException(authUsername);
         }
 
-        if (logger.isInfoEnabled()){
-            logger.info("username {} reset password",authUsername);
+        if (logger.isInfoEnabled()) {
+            logger.info("username {} reset password", authUsername);
         }
         authUserDao.updatePasswordByName(authUsername, newPassword);
 
     }
 
     @Override
-    public void resetPassword(@NotNull String authUsername, @NotNull String authPassword, @NotNull String newPassword, boolean enablePasswordValidate)  {
+    public void resetPassword(@NotNull String authUsername, @NotNull String authPassword, @NotNull String newPassword, boolean enablePasswordValidate) {
 
         if (enablePasswordValidate) {
             passwordValidator.validatePassword(newPassword);
         }
         AuthUser authUser = authUserDao.queryAuthUserByAuthUsername(authUsername);
         if (authUser == null) {
-            logger.warn("username {} not exist in reset password",authUsername);
+            logger.warn("username {} not exist in reset password", authUsername);
             throw new AuthUserNotExistException(authUsername);
         }
-        String dataBasePassword=  PostHandlePassword.encryptPassword(authPassword);
-        if (!dataBasePassword.equals(authUser.getAuthPassword())){
+        String dataBasePassword = PostHandlePassword.encryptPassword(authPassword);
+        if (!dataBasePassword.equals(authUser.getAuthPassword())) {
             throw new PasswordErrorException(authUsername);
         }
 
-        if (logger.isInfoEnabled()){
-            logger.info("username {} reset password",authUsername);
+        if (logger.isInfoEnabled()) {
+            logger.info("username {} reset password", authUsername);
         }
         authUserDao.updatePasswordByName(authUsername, newPassword);
     }
-
 
 
     @Override
@@ -296,6 +295,12 @@ public class AuthUserServiceImpl implements AuthUserService {
     }
 
     @Override
+    public List<String> getAuthRoleNameById(Long authUserId) {
+
+        return authUserDao.queryRoleNameByUserId(authUserId);
+    }
+
+    @Override
     public Long getAuthUserIdByName(String authUserName) throws AuthUserNotExistException {
         Long res = authUserDao.queryAuthUserIdByUsername(authUserName);
         if (res == null) {
@@ -310,9 +315,9 @@ public class AuthUserServiceImpl implements AuthUserService {
     }
 
     @Override
-    public List<AuthUser> acquireAuthUserListByNames(List<String> usernames ) {
+    public List<AuthUser> acquireAuthUserListByNames(List<String> usernames) {
 
-        if (usernames.isEmpty()){
+        if (usernames.isEmpty()) {
             return new ArrayList<>();
         }
         return authUserDao.queryAuthUserByUsernames(usernames);
@@ -338,7 +343,6 @@ public class AuthUserServiceImpl implements AuthUserService {
     public String acquireAuthUserNameById(Integer authUserId) {
         return authUserDao.queryAuthUserNameById(authUserId);
     }
-
 
 
 }

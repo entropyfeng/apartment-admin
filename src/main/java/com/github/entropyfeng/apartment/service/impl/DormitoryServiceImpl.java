@@ -24,10 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.validation.constraints.NotNull;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -112,16 +109,26 @@ public class DormitoryServiceImpl implements DormitoryService {
         return postHandlerDormitoryList(dormitoryList);
     }
 
-    private DetailDormitory acquireDetailDormitory(Dormitory dormitory) {
+    private DetailDormitory acquireDetailDormitory(@NotNull Dormitory dormitory) {
         BuildingAndGroup buildingAndGroup = campusCache.getBuildingAndGroup(dormitory.getBuildingId());
         List<DormitoryAndResident> dormitoryAndResidents = dormitoryResidentDao.queryDormitoryCurrentInfoByDormitoryId(dormitory.getDormitoryId());
         HashMap<String, Integer> bedIdMap = new HashMap<>();
         dormitoryAndResidents.stream().filter(Objects::nonNull).forEach(temp -> bedIdMap.put(temp.getResidentId(), temp.getBedId()));
         List<String> studentIdList = dormitoryAndResidents.stream().filter(Objects::nonNull).map(DormitoryAndResident::getResidentId).collect(Collectors.toList());
-        List<StudentResident> studentResidents = null;
+        List<StudentResident> studentResidents = new ArrayList<>();
+
+        Set<Integer> bedIds=new HashSet<>();
         if (!studentIdList.isEmpty()) {
             List<StudentTo> students = studentDao.queryStudentToByStudentIds(studentIdList);
             studentResidents = students.stream().map(student -> new StudentResident(student, bedIdMap.get(student.getStudentId()))).collect(Collectors.toList());
+            bedIds= studentResidents.stream().map(StudentResident::getBedId).collect(Collectors.toSet());
+
+        }
+        List<Integer> lackIds=new ArrayList<>();
+        for (int i = 0; i < dormitory.getTotalCapacity(); i++) {
+            if (!bedIds.contains(i)){
+                studentResidents.add(new StudentResident(i));
+            }
         }
 
         return new DetailDormitory(dormitory, buildingAndGroup, studentResidents);
@@ -132,16 +139,27 @@ public class DormitoryServiceImpl implements DormitoryService {
 
 
         Dormitory dormitory = dormitoryDao.queryDormitoryByResidentId(username);
-
+        if(dormitory==null){
+            return null;
+        }
         return acquireDetailDormitory(dormitory);
     }
 
     @Override
-    public DetailDormitory queryDetailDormitory(Integer dormitoryId) {
+    public DetailDormitory queryDetailDormitory(Integer dormitoryId,List<String> roleList) {
 
         Dormitory dormitory = dormitoryDao.queryDormitoryByDormitoryId(dormitoryId);
+        DetailDormitory detailDormitory=  acquireDetailDormitory(dormitory);
+        if (!roleList.contains("admin")){
 
-        return acquireDetailDormitory(dormitory);
+            detailDormitory.getStudentList().forEach(studentResident -> {
+                studentResident.setIdCardNumber("*");
+                studentResident.setEmail("*");
+                studentResident.setPhone("*");
+            });
+
+        }
+        return detailDormitory;
     }
 
     @Override

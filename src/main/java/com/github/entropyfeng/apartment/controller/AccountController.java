@@ -6,6 +6,7 @@ import com.github.entropyfeng.apartment.domain.to.LoginTo;
 import com.github.entropyfeng.apartment.domain.vo.CurrentUserVo;
 import com.github.entropyfeng.apartment.exception.AuthUserNotExistException;
 import com.github.entropyfeng.apartment.exception.PasswordErrorException;
+import com.github.entropyfeng.apartment.service.AuthRoleService;
 import com.github.entropyfeng.apartment.service.AuthUserService;
 import com.github.entropyfeng.common.config.anno.CurrentUserAnno;
 import com.github.entropyfeng.common.domain.CurrentUser;
@@ -15,6 +16,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
+
+import java.util.List;
 
 
 @RestController
@@ -36,8 +39,14 @@ public class AccountController {
         Long authUserId = currentUser.getUserId();
         try {
             AuthUser authUser = authUserService.getAuthUserById(authUserId);
+            List<String> roleNames= currentUser.getRoles();
+            String temp=roleNames.get(0);
             CurrentUserVo currentUserVo = new CurrentUserVo(authUser.getAvatar(), authUser.getAuthUsername(), authUser.getAuthUserId().toString());
-            currentUserVo.setAccess("admin");
+            if (temp.equals("administrator")){
+                currentUserVo.setAccess("admin");
+            }else {
+                currentUserVo.setAccess(temp);
+            }
             message.addData("current_user", currentUserVo);
             message.setSuccess(true);
         } catch (AuthUserNotExistException e) {

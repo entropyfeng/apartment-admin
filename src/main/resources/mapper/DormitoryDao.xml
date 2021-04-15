@@ -17,22 +17,37 @@
         <result column="update_time" property="updateTime"/>
     </resultMap>
 
+    <resultMap id="PrefixResultMap" type="com.github.entropyfeng.apartment.domain.po.Dormitory">
+        <id column="dormitory.dormitory_id" property="dormitoryId"/>
+        <result column="dormitory.building_id" property="buildingId"/>
+        <result column="dormitory.dormitory_name" property="dormitoryName"/>
+        <result column="dormitory.floor" property="floor"/>
+        <result column="dormitory.in_gender" property="inGender"/>
+        <result column="dormitory.total_capacity" property="totalCapacity"/>
+        <result column="dormitory.current_capacity" property="currentCapacity"/>
+        <result column="dormitory.dormitory_direction" property="dormitoryDirection"/>
+        <result column="dormitory.dormitory_description" property="description"/>
+        <result column="dormitory.version" property="version"/>
+        <result column="dormitory.create_time" property="createTime"/>
+        <result column="dormitory.update_time" property="updateTime"/>
+    </resultMap>
+
     <sql id="baseSql">
         dormitory_id ,building_id,dormitory_name, floor ,in_gender,total_capacity,current_capacity,dormitory_direction,dormitory_description,version,create_time,update_time
     </sql>
     <sql id="dormitoryPrefixBaseSql">
-        dormitory.dormitory_id,
-        dormitory.building_id,
-        dormitory.dormitory_name,
-        dormitory.floor ,
-        dormitory.in_gender,
-        dormitory.total_capacity,
-        dormitory.current_capacity
-        dormitory.dormitory_direction,
-        dormitory.dormitory_description,
-        dormitory.version,
-        dormitory.create_time,
-        dormitory.update_time
+        dormitory.dormitory_id as dormitory_id,
+        dormitory.building_id as building_id,
+        dormitory.dormitory_name as dormitory_name,
+        dormitory.floor as floor,
+        dormitory.in_gender as  in_gender,
+        dormitory.total_capacity as total_capacity,
+        dormitory.current_capacity as current_capacity,
+        dormitory.dormitory_direction as dormitory_direction,
+        dormitory.dormitory_description as dormitory_description,
+        dormitory.version as version,
+        dormitory.create_time as create_time,
+        dormitory.update_time as  update_time
     </sql>
     <insert id="insertDormitory" useGeneratedKeys="true">
         insert into dormitory(dormitory_id, building_id, dormitory_name, floor,
@@ -114,6 +129,14 @@
     <update id="updateCurrentCapacityRelyVersion">
         update dormitory set current_capacity=#{currentCapacity},version=version+1 where dormitory_id=#{dormitoryId} and version=#{version}
     </update>
+    <update id="updateCurrentCapacityRelyDoubleVersion">
+        update dormitory_resident,dormitory set current_capacity=#{currentCapacity},
+                                                dormitory.version=dormitory.version+1 where
+                                                dormitory_resident.version=#{residentVersion} and
+                                                dormitory.version=#{dormitoryVersion} and
+                                                dormitory.dormitory_id=#{dormitoryId}
+
+    </update>
 
     <select id="queryDormitoryByDormitoryName" resultMap="BaseResultMap"
             resultType="com.github.entropyfeng.apartment.domain.po.Dormitory">
@@ -146,6 +169,7 @@
         from dormitory where in_gender=#{inGender}
     </select>
     <select id="queryFilterDormitoryByBuildingName"
+            resultMap="BaseResultMap"
             resultType="com.github.entropyfeng.apartment.domain.po.Dormitory">
         select
         <include refid="dormitoryPrefixBaseSql"/>
@@ -155,7 +179,9 @@
     <select id="queryVersionByDormitoryId" resultType="java.lang.Long">
         select version from dormitory where dormitory_id=#{dormitoryId}
     </select>
-    <select id="queryDormitoryByResidentId" resultType="com.github.entropyfeng.apartment.domain.po.Dormitory">
+    <select id="queryDormitoryByResidentId"
+            resultMap="BaseResultMap"
+            resultType="com.github.entropyfeng.apartment.domain.po.Dormitory">
         select <include refid="dormitoryPrefixBaseSql"/> from dormitory ,dormitory_resident where dormitory_resident.resident_id=#{residentId} and dormitory_resident.dormitory_id=dormitory.dormitory_id
     </select>
 
