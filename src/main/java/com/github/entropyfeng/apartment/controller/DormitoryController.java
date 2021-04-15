@@ -89,6 +89,7 @@ public class DormitoryController {
         DetailDormitory dormitoryVO= dormitoryService.queryMyDormitory(username);
 
         message.setSuccess(true);
+        message.addData("username",currentUser.getUserName());
         if (dormitoryVO==null){
             message.addData("exist",false);
         }else {

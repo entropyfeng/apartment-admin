@@ -7,6 +7,7 @@ import com.github.entropyfeng.common.config.anno.CurrentUserAnno;
 import com.github.entropyfeng.common.domain.CurrentUser;
 import com.github.entropyfeng.common.domain.Message;
 import com.github.entropyfeng.common.exception.BusinessException;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -70,31 +71,38 @@ public class OrderDormitoryController {
         return message;
     }
 
+    @GetMapping("/apartment/my/status")
+    public Message acquireMyDormitoryStatus(@ApiIgnore @CurrentUserAnno CurrentUser currentUser){
+
+       Boolean exist= orderService.hasInDormitory(currentUser.getUserName());
+        Message message=new Message();
+        message.setSuccess(true);
+        message.addData("myStatus",exist);
+        return message;
+
+    }
+
     @PostMapping("/apartment/my/checkIn")
-    public Message checkInMyDormitory(@ApiIgnore@CurrentUserAnno CurrentUser currentUser, @RequestParam("dormitoryId") Integer dormitoryId, @RequestParam("bedId") Integer bedId) {
+    public Message checkInMyDormitory(@ApiIgnore @CurrentUserAnno CurrentUser currentUser, @RequestParam("dormitoryId") Integer dormitoryId, @RequestParam("bedId") Integer bedId) {
         Message message = new Message();
 
-        try {
-            orderService.checkInDormitory(currentUser.getUserName(), dormitoryId, bedId);
-            message.addData("checkInStatus", true);
-        } catch (BusinessException e) {
-            message.addData("checkInStatus", false);
-            e.printStackTrace();
-        }
+        message.setSuccess(true);
+        orderService.checkInDormitory(currentUser.getUserName(), dormitoryId, bedId);
+        message.addData("checkInStatus", true);
 
         return message;
     }
 
     @PostMapping("/apartment/my/checkOut")
-    public Message checkOutMyDormitory(@ApiIgnore@CurrentUserAnno CurrentUser currentUser) {
+    public Message checkOutMyDormitory(@ApiIgnore @CurrentUserAnno CurrentUser currentUser) {
 
         Message message = new Message();
-
+        message.setSuccess(true);
         try {
             orderService.checkOutDormitory(currentUser.getUserName());
             message.addData("checkOutStatus", true);
         } catch (BusinessException e) {
-            message.addData("checkOutStatus",false);
+            message.addData("checkOutStatus", false);
             e.printStackTrace();
         }
 

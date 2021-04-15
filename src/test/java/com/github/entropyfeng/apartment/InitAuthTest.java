@@ -93,7 +93,7 @@ public class InitAuthTest {
         authResourceService.addNewResource("acquireAvailableDormitory","GET","/apartment/university/available/dormitories");
         authResourceService.addNewResource("checkInMyDormitory","POST","/apartment/my/checkIn");
         authResourceService.addNewResource("checkOutMyDormitory","POST","/apartment/my/checkOut");
-
+        authResourceService.addNewResource("acquireMyDormitoryStatus","GET","/apartment/my/status");
 
 
         authRoleService.grantResourceToRole("administrator", "acquireCurrentUser");
@@ -123,6 +123,8 @@ public class InitAuthTest {
         authRoleService.grantResourceToRole("student","acquireDetailDormitory");
         authRoleService.grantResourceToRole("student","checkInMyDormitory");
         authRoleService.grantResourceToRole("student","checkOutMyDormitory");
+        authRoleService.grantResourceToRole("student","acquireMyDormitoryStatus");
+
     }
 
 

@@ -63,8 +63,15 @@
 where resident_id=#{residentId} and dormitory.version=#{dormitoryVersion}
 and dormitory_resident.version=#{residentVersion}
   </update>
+    <update id="updateInDormitoryRelyDoubleVersion">
 
-  <select id="queryDormitoryCurrentInfo"
+update dormitory_resident ,dormitory set resident_id=#{residentId},dormitory_resident.version=dormitory_resident.version+1
+where dormitory_resident.dormitory_id=#{dormitoryId} and dormitory_resident.bed_id=#{bedId}
+and dormitory_resident.version=#{dormitoryVersion} and dormitory.version=#{residentVersion}
+
+    </update>
+
+    <select id="queryDormitoryCurrentInfo"
           resultMap="ResidentAndBedMap"
           resultType="com.github.entropyfeng.apartment.domain.to.ResidentAndBed">
     select resident_id,bed_id from dormitory_resident where dormitory_id=#{dormitoryId}

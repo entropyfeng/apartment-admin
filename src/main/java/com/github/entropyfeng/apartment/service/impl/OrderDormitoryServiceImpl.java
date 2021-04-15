@@ -90,11 +90,17 @@ public class OrderDormitoryServiceImpl implements OrderDormitoryService {
 
     @Override
     public Boolean hasInDormitory(@NotNull String residentId) {
-        return dormitoryResidentDao.querySingleResidentStatus(residentId);
+       Boolean res= dormitoryResidentDao.querySingleResidentStatus(residentId);
+       if (res==null){
+           return Boolean.FALSE;
+       }
+
+       return res;
     }
 
     /**
      * 预定寝室
+     *
      * @param residentId  用户名
      * @param dormitoryId 寝室Id
      * @param bedId       床位号
@@ -103,12 +109,15 @@ public class OrderDormitoryServiceImpl implements OrderDormitoryService {
     @Override
     public void checkInDormitory(@NotNull String residentId, @NotNull Integer dormitoryId, @NotNull Integer bedId) throws AlreadyCheckInException {
 
+        if (logger.isInfoEnabled()){
+            logger.info("resident {} try to check in dormitory {} bed {}",residentId,dormitoryId,bedId);
+        }
         DormitoryResident resident = dormitoryResidentDao.queryDormitoryResidentByResidentId(residentId);
         if (resident != null) {
             if (logger.isWarnEnabled()) {
                 logger.warn("resident -> residentId {} already check in", residentId);
             }
-            throw new BusinessException(residentId + "已经存在住宿信息", ErrorCode.REQUEST_PARA_ERROR);
+            throw new BusinessParaException(residentId + "已经存在住宿信息");
         }
         Dormitory dormitory = dormitoryDao.queryDormitoryByDormitoryId(dormitoryId);
         if (dormitory == null) {
@@ -117,30 +126,34 @@ public class OrderDormitoryServiceImpl implements OrderDormitoryService {
             }
             throw new BusinessParaException("dormitory's dormitoryId ->" + dormitoryId + " not exist");
         }
-
-
         Integer currentCapacity = dormitory.getCurrentCapacity();
         if (currentCapacity < dormitory.getTotalCapacity()) {
-                /*
-                  创建时生成skeleton,一定不为null
-                 */
+            /*
+               创建时生成skeleton,一定不为null
+            */
             ResidentBedVersion residentBedVersion = dormitoryResidentDao.queryCurrentBedInfo(dormitoryId, bedId);
             String currentResidentId = residentBedVersion.getResidentId();
             if (currentResidentId == null) {
                 Long residentVersion = residentBedVersion.getVersion();
-
-                Integer count = dormitoryResidentDao.updateDormitoryResidentRelyVersion(dormitoryId, bedId, residentId, residentVersion);
-                if (count.equals(1)) {
-                    Long dormitoryVersion = dormitory.getVersion();
-                    Integer dormitoryCount = dormitoryDao.updateCurrentCapacityRelyVersion(dormitoryId, currentCapacity + 1, dormitoryVersion);
-                    if (dormitoryCount.equals(1)) {
+                Long dormitoryVersion = dormitory.getVersion();
+                Integer res1 = dormitoryDao.updateCurrentCapacityRelyDoubleVersion(dormitoryId, currentCapacity + 1, residentVersion, dormitoryVersion);
+                if (res1.equals(1)) {
+                    Integer res2 = dormitoryResidentDao.updateInDormitoryRelyDoubleVersion(dormitoryId, bedId, residentId, dormitoryVersion , residentVersion);
+                    if (res2.equals(1)) {
+                        if (logger.isInfoEnabled()){
+                            logger.info("resident {} success to check in dormitory {} bed {}",residentId,dormitoryId,bedId);
+                        }
                         return;
                     }
+                    throw new BusinessException("业务繁忙，请重试",ErrorCode.SERVER_BUSINESS);
                 }
-                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            throw new BusinessParaException("该空床位不存在");
             }
         }
-
+        if (logger.isInfoEnabled()){
+            logger.info("resident {} fail to check in dormitory {} bed {}",residentId,dormitoryId,bedId);
+        }
+        throw new BusinessParaException("房间已满");
 
     }
 
@@ -148,9 +161,12 @@ public class OrderDormitoryServiceImpl implements OrderDormitoryService {
     @Override
     public void checkOutDormitory(@NotNull String residentId) {
 
+        if (logger.isInfoEnabled()){
+            logger.info("resident {} try check out dormitory",residentId);
+        }
         Dormitory dormitory = dormitoryDao.queryDormitoryByResidentId(residentId);
         if (dormitory == null) {
-            throw new BusinessException("residentId :" + residentId + " not check in", ErrorCode.REQUEST_PARA_ERROR);
+            throw new BusinessException("residentId :" + residentId + " not check in but try to check out", ErrorCode.REQUEST_PARA_ERROR);
         }
         boolean safe = checkIsLegalCapacity(dormitory.getTotalCapacity(), dormitory.getCurrentCapacity());
         if (!safe) {
@@ -161,8 +177,11 @@ public class OrderDormitoryServiceImpl implements OrderDormitoryService {
 
         if (resident.getDormitoryId().equals(dormitory.getDormitoryId())) {
             Integer res1 = dormitoryDao.updateCurrentCapacityRelyDoubleVersion(dormitory.getDormitoryId(), dormitory.getCurrentCapacity() - 1, resident.getVersion(), dormitory.getVersion());
-            Integer res2 = dormitoryResidentDao.updateQuitDormitoryRelyDoubleVersion(dormitory.getDormitoryId(), residentId, dormitory.getVersion() + 1, resident.getVersion());
+            Integer res2 = dormitoryResidentDao.updateQuitDormitoryRelyDoubleVersion(dormitory.getDormitoryId(), residentId, dormitory.getVersion(), resident.getVersion());
             if (res1.equals(1) && res1.equals(res2)) {
+                if (logger.isInfoEnabled()){
+                    logger.info("resident {} success check out",residentId);
+                }
                 return;
             }
         }

@@ -1,6 +1,8 @@
 package com.github.entropyfeng.apartment.exception;
 
-public class AlreadyCheckInException extends RuntimeException{
+import com.github.entropyfeng.common.exception.BusinessException;
+
+public class AlreadyCheckInException extends BusinessException {
 
     public AlreadyCheckInException() {
     }

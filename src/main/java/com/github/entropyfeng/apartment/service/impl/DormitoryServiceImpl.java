@@ -124,7 +124,7 @@ public class DormitoryServiceImpl implements DormitoryService {
             bedIds= studentResidents.stream().map(StudentResident::getBedId).collect(Collectors.toSet());
 
         }
-        List<Integer> lackIds=new ArrayList<>();
+
         for (int i = 0; i < dormitory.getTotalCapacity(); i++) {
             if (!bedIds.contains(i)){
                 studentResidents.add(new StudentResident(i));
@@ -150,7 +150,7 @@ public class DormitoryServiceImpl implements DormitoryService {
 
         Dormitory dormitory = dormitoryDao.queryDormitoryByDormitoryId(dormitoryId);
         DetailDormitory detailDormitory=  acquireDetailDormitory(dormitory);
-        if (!roleList.contains("admin")){
+        if (!roleList.contains("administrator")){
 
             detailDormitory.getStudentList().forEach(studentResident -> {
                 studentResident.setIdCardNumber("*");

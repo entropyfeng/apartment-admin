@@ -2,6 +2,7 @@ package com.github.entropyfeng.apartment.dao;
 
 import com.github.entropyfeng.apartment.domain.po.DormitoryResident;
 import com.github.entropyfeng.apartment.domain.to.*;
+import io.swagger.models.auth.In;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -38,6 +39,8 @@ public interface DormitoryResidentDao {
     Integer updateQuitDormitory(@Param("dormitoryId") Integer dormitoryId,  @Param("residentId") String residentId,@Param("version")Long version);
 
     Integer updateQuitDormitoryRelyDoubleVersion(@Param("dormitoryId") Integer dormitoryId,  @Param("residentId") String residentId,@Param("dormitoryVersion")Long dormitoryVersion,@Param("residentVersion")Long residentVersion);
+
+    Integer updateInDormitoryRelyDoubleVersion(@Param("dormitoryId") Integer dormitoryId,  @Param("bedId")Integer bedId,@Param("residentId") String residentId,@Param("dormitoryVersion")Long dormitoryVersion,@Param("residentVersion")Long residentVersion);
 
     Integer queryResidentCount(@Param("dormitoryId") Integer dormitoryId);
 
