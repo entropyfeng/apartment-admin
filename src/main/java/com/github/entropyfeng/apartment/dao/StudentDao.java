@@ -52,6 +52,7 @@ public interface StudentDao {
 
     void updateAccountStatus(@Param("studentId")String studentId,@Param("status") StudentAccountStatus status);
 
+    void updateByStudentIdSelective(@Param("student")Student student);
     //void updateBatchAccountStatus(@Param("list")List<String> studentIdList,@Param("status")StudentAccountStatus status);
 
     String queryCollegeNameByStudentId(@Param("studentId") String studentId);

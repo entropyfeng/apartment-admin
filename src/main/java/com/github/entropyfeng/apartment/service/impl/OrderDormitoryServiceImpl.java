@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,14 +58,17 @@ public class OrderDormitoryServiceImpl implements OrderDormitoryService {
     }
 
     @Override
-    public List<String> filterAvailableCampusName(@NotNull String residentId) {
+    public List<String> filterAvailableCampusName(@NotEmpty List<String> roleNames, @NotNull String residentId) {
         return campusDao.queryAllCampusName();
     }
 
     @Override
-    public List<String> filterAvailableCampusGroup(@NotNull String residentId, @NotNull String campusName) {
+    public List<String> filterAvailableCampusGroupName(@NotEmpty List<String> roleNames, @NotNull String residentId, @NotNull String campusName) {
 
 
+        if (isAdmin(roleNames)){
+           return campusGroupDao.queryCampusGroupNamesByCampusName(campusName);
+        }
         InGender inGender = acquireInGender(residentId);
         if (inGender == null) {
             return new ArrayList<>();
@@ -72,15 +76,19 @@ public class OrderDormitoryServiceImpl implements OrderDormitoryService {
         return campusGroupDao.queryAvailableCampusAndGroupName(campusName, inGender, InGender.MIX);
     }
 
-    public List<String> filterAvailableBuildingName(@NotNull String residentId, @NotNull String campusGroupName) {
-        InGender gender = acquireInGender(residentId);
+    public List<String> filterAvailableBuildingName(@NotEmpty List<String> roleNames,@NotNull String residentId, @NotNull String campusGroupName) {
 
+        if (isAdmin(roleNames)){
+            return buildingDao.queryBuildingNamesByCampusGroupName(campusGroupName);
+        }
+
+        InGender gender = acquireInGender(residentId);
         return buildingDao.queryAvailableBuildingName(campusGroupName, gender);
 
     }
 
     @Override
-    public List<DormitoryVO> filterAvailableDormitory(@NotNull String residentId, @NotNull String buildingName) {
+    public List<DormitoryVO> filterAvailableDormitory(@NotEmpty List<String> roleNames,@NotNull String residentId, @NotNull String buildingName) {
 
         InGender gender = acquireInGender(residentId);
         List<Dormitory> dormitoryList = dormitoryDao.queryFilterDormitoryByBuildingName(buildingName, gender);
@@ -222,5 +230,8 @@ public class OrderDormitoryServiceImpl implements OrderDormitoryService {
     private static boolean checkIsLegalCapacity(int maxCapacity, int currentCapacity) {
 
         return currentCapacity <= maxCapacity && currentCapacity >= 0;
+    }
+    private boolean isAdmin(List<String> strings){
+       return strings.contains("administrator");
     }
 }

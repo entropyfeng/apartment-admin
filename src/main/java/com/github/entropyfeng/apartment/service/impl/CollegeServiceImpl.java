@@ -7,6 +7,7 @@ import com.github.entropyfeng.apartment.service.UniversityIdService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -24,14 +25,32 @@ public class CollegeServiceImpl implements CollegeService {
         this.idService = idService;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void addNewCollege(String collegeName) {
 
         collegeDao.insertCollege(idService.getNextCollegeId(),collegeName);
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void addNewCollege(String collegeName, String description) {
+        collegeDao.insertCollegeByDes(idService.getNextCollegeId(),collegeName,description);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void deleteCollege(String collegeName) {
+        collegeDao.deleteCollegeByCollegeName(collegeName);
+    }
+
     @Override
     public List<College> queryAllColleges() {
         return collegeDao.queryAllCollege();
+    }
+
+    @Override
+    public List<String> queryAllCollegeNames() {
+        return collegeDao.queryAllCollegeNames();
     }
 }

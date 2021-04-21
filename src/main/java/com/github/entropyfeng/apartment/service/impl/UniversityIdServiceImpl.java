@@ -16,14 +16,16 @@ public class UniversityIdServiceImpl implements UniversityIdService {
     @Override
     public Integer getNextCollegeId() {
 
-     return  Objects.requireNonNull(redisTemplate.opsForValue().increment(DEPARTMENT_FIELD_NAME)).intValue();
+     return  Objects.requireNonNull(redisTemplate.opsForValue().increment(COLLEGE_FIELD_NAME)).intValue();
 
     }
 
+
+    private void clearCollegeId(){
+        redisTemplate.delete(COLLEGE_FIELD_NAME);
+    }
     @Override
     public void clearAll() {
-        ArrayList<String> toDeletes=new ArrayList<>();
-        toDeletes.add(DEPARTMENT_FIELD_NAME);
-        redisTemplate.delete(toDeletes);
+        clearCollegeId();
     }
 }

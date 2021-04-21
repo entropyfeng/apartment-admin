@@ -35,4 +35,7 @@
     <select id="queryAllCampusName" resultType="java.lang.String">
       select campus_name from campus
     </select>
+    <select id="selectCampusCount" resultType="java.lang.Integer">
+      select count(campus_name)from campus
+    </select>
 </mapper>

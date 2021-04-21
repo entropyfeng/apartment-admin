@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import javax.validation.constraints.NotNull;
@@ -32,7 +33,6 @@ public class DormitoryServiceImpl implements DormitoryService {
 
 
     private static final Logger logger = LoggerFactory.getLogger(DormitoryServiceImpl.class);
-
 
     @Autowired
     public DormitoryServiceImpl(StudentDao studentDao, BuildingService buildingService, CampusCache campusCache, ApartmentIdService idService, DormitoryResidentDao dormitoryResidentDao, DormitoryDao dormitoryDao, BuildingDao buildingDao) {
@@ -59,6 +59,7 @@ public class DormitoryServiceImpl implements DormitoryService {
 
     private final BuildingService buildingService;
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void addNewDormitory(DormitoryVO dormitoryVO) {
         if (StringUtils.isEmpty(dormitoryVO.getDormitoryName())) {
@@ -77,8 +78,15 @@ public class DormitoryServiceImpl implements DormitoryService {
 
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void deleteDormitoryByDormitoryName(String dormitoryName) {
+        dormitoryDao.deleteDormitoryByDormitoryName(dormitoryName);
+    }
 
-    private void addNewDormitoryByBuildingName(DormitoryVO dormitoryVO) {
+
+    @Transactional(rollbackFor = Exception.class)
+    public void addNewDormitoryByBuildingName(DormitoryVO dormitoryVO) {
 
         String buildingName = dormitoryVO.getBuildingName();
         Integer buildingId = buildingDao.queryBuildingIdByBuildingName(buildingName);
@@ -107,6 +115,31 @@ public class DormitoryServiceImpl implements DormitoryService {
     public List<DormitoryVO> queryAllDormitories() {
         List<Dormitory> dormitoryList = dormitoryDao.queryAllDormitory();
         return postHandlerDormitoryList(dormitoryList);
+    }
+
+    @Override
+    public int acquireDormitoryNum() {
+       return dormitoryDao.selectDormitoryNum();
+    }
+
+    @Override
+    public int acquireResidentNum() {
+        return dormitoryDao.selectResidentNum();
+    }
+
+    @Override
+    public int acquireWomanBedNum() {
+      return dormitoryDao.selectBedNumByGender(InGender.WOMAN);
+    }
+
+    @Override
+    public int acquireManBedNum() {
+     return dormitoryDao.selectBedNumByGender(InGender.MAN);
+    }
+
+    @Override
+    public int acquireBedNum() {
+       return dormitoryDao.selectBedNum();
     }
 
     private DetailDormitory acquireDetailDormitory(@NotNull Dormitory dormitory) {
@@ -193,6 +226,12 @@ public class DormitoryServiceImpl implements DormitoryService {
         List<Dormitory> dormitoryList = dormitoryDao.queryDormitoryByBuildingId(buildingId);
         return postHandlerDormitoryList(dormitoryList);
 
+    }
+
+    @Override
+    public List<DormitoryVO> queryDormitories(String buildingName) {
+        List<Dormitory> dormitoryList = dormitoryDao.queryDormitoryByBuildingName(buildingName);
+        return postHandlerDormitoryList(dormitoryList);
     }
 
     @Override

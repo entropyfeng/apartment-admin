@@ -4,19 +4,21 @@ import com.github.entropyfeng.apartment.domain.vo.DormitoryVO;
 import com.github.entropyfeng.apartment.exception.AlreadyCheckInException;
 import com.github.entropyfeng.apartment.exception.AlreadyCheckOutException;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
 public interface OrderDormitoryService {
 
 
-    List<DormitoryVO> filterAvailableDormitory(@NotNull String residentId, @NotNull String buildingName);
+    List<DormitoryVO> filterAvailableDormitory(@NotEmpty List<String> roleNames,@NotNull String residentId, @NotNull String buildingName);
 
-    List<String> filterAvailableCampusGroup(@NotNull String residentId,@NotNull String campusName);
+    List<String> filterAvailableCampusGroupName(@NotEmpty List<String> roleNames, @NotNull String residentId, @NotNull String campusName);
 
-    List<String> filterAvailableCampusName(@NotNull String residentId);
+    List<String> filterAvailableCampusName(@NotEmpty List<String> roleNames, @NotNull String residentId);
 
-    List<String> filterAvailableBuildingName(@NotNull String residentId,@NotNull String campusGroupName);
+
+    List<String> filterAvailableBuildingName(@NotEmpty List<String> roleNames,@NotNull String residentId,@NotNull String campusGroupName);
 
     Boolean hasInDormitory(@NotNull String residentId);
 

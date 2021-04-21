@@ -17,20 +17,6 @@
         <result column="update_time" property="updateTime"/>
     </resultMap>
 
-    <resultMap id="PrefixResultMap" type="com.github.entropyfeng.apartment.domain.po.Dormitory">
-        <id column="dormitory.dormitory_id" property="dormitoryId"/>
-        <result column="dormitory.building_id" property="buildingId"/>
-        <result column="dormitory.dormitory_name" property="dormitoryName"/>
-        <result column="dormitory.floor" property="floor"/>
-        <result column="dormitory.in_gender" property="inGender"/>
-        <result column="dormitory.total_capacity" property="totalCapacity"/>
-        <result column="dormitory.current_capacity" property="currentCapacity"/>
-        <result column="dormitory.dormitory_direction" property="dormitoryDirection"/>
-        <result column="dormitory.dormitory_description" property="description"/>
-        <result column="dormitory.version" property="version"/>
-        <result column="dormitory.create_time" property="createTime"/>
-        <result column="dormitory.update_time" property="updateTime"/>
-    </resultMap>
 
     <sql id="baseSql">
         dormitory_id ,building_id,dormitory_name, floor ,in_gender,total_capacity,current_capacity,dormitory_direction,dormitory_description,version,create_time,update_time
@@ -137,6 +123,9 @@
                                                 dormitory.dormitory_id=#{dormitoryId}
 
     </update>
+    <delete id="deleteDormitoryByDormitoryName">
+        delete  from dormitory where dormitory_name=#{dormitoryName}
+    </delete>
 
     <select id="queryDormitoryByDormitoryName" resultMap="BaseResultMap"
             resultType="com.github.entropyfeng.apartment.domain.po.Dormitory">
@@ -183,6 +172,27 @@
             resultMap="BaseResultMap"
             resultType="com.github.entropyfeng.apartment.domain.po.Dormitory">
         select <include refid="dormitoryPrefixBaseSql"/> from dormitory ,dormitory_resident where dormitory_resident.resident_id=#{residentId} and dormitory_resident.dormitory_id=dormitory.dormitory_id
+    </select>
+    <select id="queryDormitoryByBuildingName"
+            resultMap="BaseResultMap"
+            resultType="com.github.entropyfeng.apartment.domain.po.Dormitory">
+        select
+        <include refid="dormitoryPrefixBaseSql"/>
+        from dormitory,building where building.building_name=#{buildingName} and building.building_id=dormitory.building_id
+    </select>
+    <select id="selectDormitoryNum" resultType="java.lang.Integer">
+        select count(dormitory_id) from dormitory
+    </select>
+    <select id="selectResidentNum" resultType="java.lang.Integer">
+        select count(resident_id) from dormitory_resident where resident_id IS NOT NULL
+    </select>
+    <select id="selectBedNum" resultType="java.lang.Integer">
+        select sum(total_capacity) from dormitory
+    </select>
+
+
+    <select id="selectBedNumByGender" resultType="java.lang.Integer">
+        select sum(total_capacity) from dormitory where in_gender=#{inGender}
     </select>
 
 </mapper>

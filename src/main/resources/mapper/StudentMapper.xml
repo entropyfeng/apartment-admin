@@ -1,126 +1,188 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.github.entropyfeng.apartment.dao.StudentDao">
-  <resultMap id="BaseResultMap" type="com.github.entropyfeng.apartment.domain.po.Student">
-    <id column="student_id" property="studentId"/>
-    <result column="student_name" property="studentName"/>
-    <result column="college_id" property="collegeId"/>
-    <result column="id_card_number" property="idCardNumber"/>
-    <result column="gender" property="gender"/>
-    <result column="phone" property="phone"/>
-    <result column="email" property="email"/>
-    <result column="register_year" property="registerYear"/>
-    <result column="student_status" property="studentStatus"/>
-    <result column="acc_status" property="studentAccountStatus"/>
-    <result column="student_description" property="description"/>
-    <result column="create_time" property="createTime" />
-    <result column="update_time" property="updateTime" />
-  </resultMap>
-  <resultMap id="StudentToMap" type="com.github.entropyfeng.apartment.domain.to.StudentTo">
-    <id column="student_id" property="studentId"/>
-    <result column="student_name" property="studentName"/>
-    <result column="college_name" property="collegeName"/>
-    <result column="id_card_number" property="idCardNumber"/>
-    <result column="gender" property="gender"/>
-    <result column="phone" property="phone"/>
-    <result column="email" property="email"/>
-    <result column="register_year" property="registerYear"/>
-  </resultMap>
+    <resultMap id="BaseResultMap" type="com.github.entropyfeng.apartment.domain.po.Student">
+        <id column="student_id" property="studentId"/>
+        <result column="student_name" property="studentName"/>
+        <result column="college_id" property="collegeId"/>
+        <result column="id_card_number" property="idCardNumber"/>
+        <result column="gender" property="gender"/>
+        <result column="phone" property="phone"/>
+        <result column="email" property="email"/>
+        <result column="register_year" property="registerYear"/>
+        <result column="student_status" property="studentStatus"/>
+        <result column="acc_status" property="studentAccountStatus"/>
+        <result column="student_description" property="description"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+    <resultMap id="StudentToMap" type="com.github.entropyfeng.apartment.domain.to.StudentTo">
+        <id column="student_id" property="studentId"/>
+        <result column="student_name" property="studentName"/>
+        <result column="college_name" property="collegeName"/>
+        <result column="id_card_number" property="idCardNumber"/>
+        <result column="gender" property="gender"/>
+        <result column="phone" property="phone"/>
+        <result column="email" property="email"/>
+        <result column="register_year" property="registerYear"/>
+    </resultMap>
 
-  <sql id="studentToSql">
-    student.student_id, college.college_name,student.student_name, student.gender, student.id_card_number,student.phone, student.email,student.register_year
-  </sql>
+    <sql id="studentToSql">
+        student.student_id, college.college_name,student.student_name, student.gender, student.id_card_number,student.phone, student.email,student.register_year
+    </sql>
 
-  <sql id="baseSql">
-    student_id, student_name, college_id, college_id,acc_status,  id_card_number, gender, phone, email, student_status,register_year,student_description,create_time,update_time
-  </sql>
+    <sql id="baseSql">
+        student_id, student_name, college_id, college_id,acc_status,  id_card_number, gender, phone, email, student_status,register_year,student_description,create_time,update_time
+    </sql>
 
-  <insert id="insertStudentContainsCollege">
-    insert into student(student_id,student_name,college_id,gender) VALUES (#{studentId},#{studentName},#{collegeId},#{gender})
-  </insert>
-  <insert id="insertStudent" useGeneratedKeys="true" parameterType="com.github.entropyfeng.apartment.domain.po.Student">
-    insert into student (student_id, student_name, id_card_number,  college_id, gender,student_status, acc_status,
-                           email, phone, register_year, student_description)
-    values (#{student.studentId},#{student.studentName},#{student.idCardNumber},
-           #{student.collegeId},#{student.gender},
-            #{student.studentStatus},#{student.studentAccountStatus},
-            #{student.email},#{student.phone},#{student.registerYear},#{student.description});
-  </insert>
-  <insert id="insertBatchStudent" parameterType="java.util.List">
-    insert into student (student_id, student_name, id_card_number, college_id, gender, acc_status,
-                         student_status, email, phone, register_year, student_description)
-    values
-    <foreach collection="list" item="student" index="index" separator=",">
+    <insert id="insertStudentContainsCollege">
+        insert into student(student_id, student_name, college_id, gender)
+        VALUES (#{studentId}, #{studentName}, #{collegeId}, #{gender})
+    </insert>
+    <insert id="insertStudent" useGeneratedKeys="true"
+            parameterType="com.github.entropyfeng.apartment.domain.po.Student">
+        insert into student (student_id, student_name, id_card_number, college_id, gender, student_status, acc_status,
+                             email, phone, register_year, student_description)
+        values (#{student.studentId}, #{student.studentName}, #{student.idCardNumber},
+                #{student.collegeId}, #{student.gender},
+                #{student.studentStatus}, #{student.studentAccountStatus},
+                #{student.email}, #{student.phone}, #{student.registerYear}, #{student.description});
+    </insert>
+    <insert id="insertBatchStudent" parameterType="java.util.List">
+        insert into student (student_id, student_name, id_card_number, college_id, gender, acc_status,
+        student_status, email, phone, register_year, student_description)
+        values
+        <foreach collection="list" item="student" index="index" separator=",">
 
-      (#{student.studentId},#{student.studentName},#{student.idCardNumber},
-      #{student.collegeId},#{student.gender},
-      #{student.accStatus},#{student.studentStatus},
-      #{student.email},#{student.phone},#{student.registerYear},#{student.description})
-    </foreach>
+            (#{student.studentId},#{student.studentName},#{student.idCardNumber},
+            #{student.collegeId},#{student.gender},
+            #{student.accStatus},#{student.studentStatus},
+            #{student.email},#{student.phone},#{student.registerYear},#{student.description})
+        </foreach>
 
-  </insert>
+    </insert>
 
-  <update id="truncateStudent">
-    truncate table student
-  </update>
-  <update id="updateStudentCollege">
-    update student set college_id=#{apartmentId} where student_id=#{studentId}
-  </update>
-  <update id="updateAccountStatus">
-    update student set acc_status=#{status} where student_id=#{studentId}
-  </update>
+    <update id="truncateStudent">
+        truncate table student
+    </update>
+    <update id="updateStudentCollege">
+        update student
+        set college_id=#{apartmentId}
+        where student_id = #{studentId}
+    </update>
+    <update id="updateAccountStatus">
+        update student
+        set acc_status=#{status}
+        where student_id = #{studentId}
+    </update>
 
-  <delete id="deleteStudentByStudentName">
-    delete  from student where student_name=#{studentName}
-  </delete>
-  <delete id="deleteStudentByStudentId">
-    delete  from student where student_id=#{studentId}
-  </delete>
-  <select id="queryStudentByStudentName" resultMap="BaseResultMap" resultType="com.github.entropyfeng.apartment.domain.po.Student">
-    select <include refid="baseSql"/> from student where student_name=#{studentName}
-  </select>
-  <select id="queryStudentByStudentId" resultMap="BaseResultMap" resultType="com.github.entropyfeng.apartment.domain.po.Student">
-    select <include refid="baseSql"/> from student where student_id=#{studentId}
-  </select>
-  <select id="queryAllStudents" resultMap="BaseResultMap" resultType="com.github.entropyfeng.apartment.domain.po.Student">
-    select <include refid="baseSql"/> from student
-  </select>
-  <select id="queryStudentsByCollegeId" resultType="com.github.entropyfeng.apartment.domain.po.Student">
-    select <include refid="baseSql"/> from student where college_id=#{apartmentId}
-  </select>
-  <select id="queryStudentsByStudentIds" resultType="com.github.entropyfeng.apartment.domain.po.Student">
+    <delete id="deleteStudentByStudentName">
+        delete
+        from student
+        where student_name = #{studentName}
+    </delete>
+    <delete id="deleteStudentByStudentId">
+        delete
+        from student
+        where student_id = #{studentId}
+    </delete>
+    <select id="queryStudentByStudentName" resultMap="BaseResultMap"
+            resultType="com.github.entropyfeng.apartment.domain.po.Student">
+        select
+        <include refid="baseSql"/>
+        from student where student_name=#{studentName}
+    </select>
+    <select id="queryStudentByStudentId" resultMap="BaseResultMap"
+            resultType="com.github.entropyfeng.apartment.domain.po.Student">
+        select
+        <include refid="baseSql"/>
+        from student where student_id=#{studentId}
+    </select>
+    <select id="queryAllStudents" resultMap="BaseResultMap"
+            resultType="com.github.entropyfeng.apartment.domain.po.Student">
+        select
+        <include refid="baseSql"/>
+        from student
+    </select>
+    <select id="queryStudentsByCollegeId" resultType="com.github.entropyfeng.apartment.domain.po.Student">
+        select
+        <include refid="baseSql"/>
+        from student where college_id=#{apartmentId}
+    </select>
+    <select id="queryStudentsByStudentIds" resultType="com.github.entropyfeng.apartment.domain.po.Student">
 
-      select <include refid="baseSql"/>from student where  student_id in
-      <foreach collection="list"  item="id" open="(" separator="," close=")"  >
-        #{id}
-      </foreach>
-  </select>
+        select<include refid="baseSql"/>from student where student_id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
     <select id="queryStudentGenderByStudentId" resultType="com.github.entropyfeng.apartment.domain.Gender">
-      select gender from student where student_id=#{studentId}
+        select gender
+        from student
+        where student_id = #{studentId}
     </select>
 
 
     <select id="queryCollegeNameByStudentId" resultType="java.lang.String">
-      select college_name from college,student where student.college_id=college.college_id and student_id=#{studentId}
+        select college_name
+        from college,
+             student
+        where student.college_id = college.college_id
+          and student_id = #{studentId}
     </select>
 
 
-  <select id="queryStudentNameByStudentId" resultType="java.lang.String">
-    select student_name from student where student_id=#{studentId}
-  </select>
-  <select id="queryStudentToByStudentIds"
-          resultMap="StudentToMap"
-          resultType="com.github.entropyfeng.apartment.domain.to.StudentTo">
-    select <include refid="studentToSql"/> from student,college where
-    student.college_id=college.college_id and student.student_id in
-    <foreach collection="list"  item="id" open="(" separator="," close=")"  >
-      #{id}
-    </foreach>
+    <select id="queryStudentNameByStudentId" resultType="java.lang.String">
+        select student_name
+        from student
+        where student_id = #{studentId}
+    </select>
+    <select id="queryStudentToByStudentIds"
+            resultMap="StudentToMap"
+            resultType="com.github.entropyfeng.apartment.domain.to.StudentTo">
+        select
+        <include refid="studentToSql"/>
+        from student,college where
+        student.college_id=college.college_id and student.student_id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
 
-  </select>
+    </select>
     <select id="queryAllStudentIds" resultType="java.lang.String">
-      select student_id from student
+        select student_id
+        from student
     </select>
 
 
+    <update id="updateByStudentIdSelective" parameterType="com.github.entropyfeng.apartment.domain.po.Student">
+        update student
+        <set>
+            <if test="studentName != null">
+                student_name = #{studentName,jdbcType=VARCHAR},
+            </if>
+            <if test="idCardNumber != null">
+                id_card_number = #{idCardNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="collegeId != null">
+                college_id = #{collegeId,jdbcType=INTEGER},
+            </if>
+            <if test="gender != null">
+                gender = #{gender,jdbcType=TINYINT},
+            </if>
+            <if test="email != null">
+                email = #{email,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null">
+                phone = #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="registerYear != null">
+                register_year = #{registerYear,jdbcType=VARCHAR},
+            </if>
+            <if test="studentDescription != null">
+                student_description = #{studentDescription,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where student_id = #{student,jdbcType=INTEGER}
+    </update>
 </mapper>

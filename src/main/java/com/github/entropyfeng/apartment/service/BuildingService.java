@@ -11,8 +11,13 @@ public interface BuildingService {
 
      void addNewBuilding(BuildingVO buildingVO);
 
-
      List<BuildingVO> acquireAllBuildings();
+
+     int acquireBuildingNum();
+
+     List<String> acquireBuildingNames();
+
+     void deleteSingleBuilding(String buildingName);
 
      Map<Integer, BuildingAndGroup> acquireBuildingAndGroupMap();
 

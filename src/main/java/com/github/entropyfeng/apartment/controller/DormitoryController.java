@@ -8,10 +8,8 @@ import com.github.entropyfeng.common.config.anno.CurrentUserAnno;
 import com.github.entropyfeng.common.domain.CurrentUser;
 import com.github.entropyfeng.common.domain.Message;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.lang.Nullable;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
@@ -26,32 +24,32 @@ public class DormitoryController {
         this.dormitoryService = dormitoryService;
     }
 
-/*
-    @GetMapping("/apartment/dormitory")
-    public Message acquireDormitoryByBuildingId(@Param("buildingId")Integer buildingId){
-
+    @PostMapping("/apartment/dormitory")
+    public Message addSingleDormitory(@RequestBody DormitoryVO dormitoryVO){
         Message message=new Message();
-        List<DormitoryVO> dormitoryVOList= dormitoryService.queryDormitories(buildingId);
         message.setSuccess(true);
-        message.addData("dormitories",dormitoryVOList);
+        dormitoryService.addNewDormitory(dormitoryVO);
         return message;
-    }*/
-
-    @GetMapping("/apartment/dormitory/all")
-    public Message acquireAllDormitory(){
+    }
+    @DeleteMapping("/apartment/dormitory")
+    public Message deleteSingleDormitory(@RequestParam("dormitoryName")String dormitoryName){
         Message message=new Message();
         message.setSuccess(true);
-       List<DormitoryVO> dormitoryVOS= dormitoryService.queryAllDormitories();
-
-       message.addData("dormitories",dormitoryVOS);
-       return message;
+        dormitoryService.deleteDormitoryByDormitoryName(dormitoryName);
+        return message;
     }
-
-    @GetMapping("/apartment/resident")
-    public Message acquireResidentStudent(@RequestParam("")Integer dormitoryId){
-
-
-        return Message.ok();
+    @GetMapping("/apartment/dormitory/all")
+    public Message acquireAllDormitory(@Nullable @RequestParam("buildingName")String buildingName){
+        Message message=new Message();
+        message.setSuccess(true);
+        List<DormitoryVO> dormitoryVOS;
+        if (buildingName==null){
+        dormitoryVOS=   dormitoryService.queryAllDormitories();
+        }else {
+         dormitoryVOS=   dormitoryService.queryDormitories(buildingName);
+        }
+        message.addData("dormitories",dormitoryVOS);
+       return message;
     }
 
     @GetMapping("/apartment/dormitory")

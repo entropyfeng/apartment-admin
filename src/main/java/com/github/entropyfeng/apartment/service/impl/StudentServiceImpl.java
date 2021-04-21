@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -47,11 +48,58 @@ public class StudentServiceImpl implements StudentService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void createAccountForAllNonAccountStudent() {
+    public void createAccountForAllNonAccountStudent(int limit, List<String> roleNames) {
 
         List<Student> students = studentDao.queryAllStudents();
-        List<Student> noAccountStudents = students.stream().filter(student -> student.getStudentAccountStatus().equals(StudentAccountStatus.NOT_EXIST)).collect(Collectors.toList());
+        createAccount(students, roleNames, limit);
+    }
 
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void createAccountForNonAccountStudent(List<String> studentIds, List<String> roleNames) {
+
+        List<Student> students = studentDao.queryStudentsByStudentIds(studentIds);
+        createAccount(students, roleNames, 0);
+
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void createAccountForSingleStudent(String studentId) {
+
+
+        List<String> roleList = new ArrayList<>();
+        roleList.add("base");
+        roleList.add("student");
+        Student student = studentDao.queryStudentByStudentId(studentId);
+        RegisterUserTo registerUserTo = new RegisterUserTo();
+        registerUserTo.setPassword(studentId);
+        registerUserTo.setUsername(studentId);
+        registerUserTo.setPhone(student.getPhone());
+        registerUserTo.setEmail(student.getEmail());
+        authUserService.registerUser(registerUserTo, roleList);
+        studentDao.updateAccountStatus(studentId,StudentAccountStatus.EXIST);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void modifyStudentPassword(String studentId, String newPassword) {
+        authUserService.resetPassword(studentId,newPassword,false);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void deleteAccountForSingleStudent(String studentId) {
+
+        authUserService.deleteSingleUser(studentId);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void createAccount(List<Student> students, List<String> roleNames, int limit) {
+        List<Student> noAccountStudents = students.stream().filter(student -> student.getStudentAccountStatus().equals(StudentAccountStatus.NOT_EXIST)).collect(Collectors.toList());
+        if (limit > 0) {
+            noAccountStudents = noAccountStudents.stream().limit(limit).collect(Collectors.toList());
+        }
         List<RegisterUserTo> registerUserTos = noAccountStudents.stream().map(student -> {
             RegisterUserTo registerUserTo = new RegisterUserTo();
             registerUserTo.setEmail(student.getEmail());
@@ -61,11 +109,11 @@ public class StudentServiceImpl implements StudentService {
             return registerUserTo;
         }).collect(Collectors.toList());
 
-        authUserService.batchRegisterUser(registerUserTos);
+        authUserService.batchRegisterUser(registerUserTos, roleNames);
+
         noAccountStudents.forEach(student -> {
             studentDao.updateAccountStatus(student.getStudentId(), StudentAccountStatus.EXIST);
         });
-
 
     }
 
@@ -83,6 +131,7 @@ public class StudentServiceImpl implements StudentService {
         studentList.forEach(this::insertStudent);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void insertStudent(StudentTo studentTo) {
         Student student = new Student();
@@ -96,6 +145,41 @@ public class StudentServiceImpl implements StudentService {
         student.setGender(Gender.toInGender(studentTo.getGender()));
 
         studentDao.insertStudent(student);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void deleteSingleStudent(String studentId) {
+        studentDao.deleteStudentByStudentId(studentId);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void updateStudent(StudentTo studentTo) {
+
+
+        String studentId = studentTo.getStudentId();
+        Student student = studentDao.queryStudentByStudentId(studentId);
+
+        if (student != null) {
+            String email = studentTo.getEmail();
+            String phone = studentTo.getPhone();
+            String idCardNumber = studentTo.getIdCardNumber();
+
+            if (email != null) {
+                student.setEmail(email);
+            }
+            if (phone != null) {
+                student.setPhone(phone);
+            }
+            if (idCardNumber != null) {
+                student.setIdCardNumber(idCardNumber);
+            }
+
+            studentDao.updateByStudentIdSelective(student);
+        }
+
+
     }
 
     @Override

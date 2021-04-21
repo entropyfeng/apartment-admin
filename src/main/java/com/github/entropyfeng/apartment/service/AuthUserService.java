@@ -19,10 +19,11 @@ import java.util.List;
 public interface AuthUserService {
 
 
-    void registerUser(@NotNull String authUsername, @NotNull String authPassword, String email, String phone, boolean enablePasswordCheck) ;
+    void registerUser(@NotNull String authUsername, @NotNull String authPassword, String email, String phone, boolean enablePasswordCheck,List<String> roleList);
 
-    void batchRegisterUser(List<RegisterUserTo> registerUserTos);
+    void batchRegisterUser(@NotEmpty List<RegisterUserTo> registerUserTos,@NotEmpty List<String> roles);
 
+    void registerUser(@NotNull RegisterUserTo registerUserTo,List<String> roleList);
 
     /**
      * 向某用户添加角色
@@ -52,7 +53,7 @@ public interface AuthUserService {
 
     void resetPassword(@NotNull String authUsername, @NotNull String newPassword, boolean enableValidatePassword) ;
 
-    void resetPassword(@NotNull String authUsername, @NotNull String authPassword, @NotNull String newPassword, boolean enableValidatePassword) ;
+    void resetPassword(@NotNull String authUsername,@NotNull String prePassword,@NotNull String postPassword,boolean enablePasswordValidate);
 
     AuthUser getAuthUserByName(String authUsername) ;
 

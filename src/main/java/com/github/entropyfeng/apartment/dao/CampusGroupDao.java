@@ -13,6 +13,7 @@ import java.util.List;
 @Mapper
 public interface CampusGroupDao {
 
+    int selectCampusGroupCount();
     void insertCampusGroup(@Param("campusGroupId") Integer campusGroupId, @Param("campusName")String campusName, @Param("campusGroupName") String campusGroupName, @Param("inGender")InGender inGender, @Param("campusGroupDescription") String campusGroupDescription);
     void truncateCampusGroup();
     void deleteCampusGroupByCampusGroupName(@Param("campusGroupName")String campusGroupName);
@@ -22,5 +23,6 @@ public interface CampusGroupDao {
     List<CampusAndGroup> queryRelativeMap();
     List<CampusGroup> queryAvailableCampusAndGroup(@Param("campusName") String campusName,@Param("inGender")InGender inGender,@Param("mix")InGender mix);
     List<String> queryAvailableCampusAndGroupName(@Param("campusName") String campusName,@Param("inGender")InGender inGender,@Param("mix")InGender mix);
-
+    List<String> queryAllCampusGroupNames();
+    List<String> queryCampusGroupNamesByCampusName(@Param("campusName") String campusName);
 }

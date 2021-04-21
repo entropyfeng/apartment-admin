@@ -8,11 +8,13 @@ import com.github.entropyfeng.apartment.domain.po.Building;
 import com.github.entropyfeng.apartment.domain.to.BuildingAndGroup;
 import com.github.entropyfeng.apartment.domain.to.CampusAndGroup;
 import com.github.entropyfeng.apartment.domain.vo.BuildingVO;
+import com.github.entropyfeng.apartment.exception.BusinessParaException;
 import com.github.entropyfeng.apartment.service.ApartmentIdService;
 import com.github.entropyfeng.apartment.service.BuildingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
@@ -24,21 +26,18 @@ import java.util.Map;
 public class BuildingServiceImpl implements BuildingService {
 
 
-    private static final String BUILDING_INFO_FIELD = "bud_info";
     private final CampusGroupDao campusGroupDao;
 
     private final BuildingDao buildingDao;
 
     private final ApartmentIdService idService;
     private final CampusCache campusCache;
-    private StringRedisTemplate redisTemplate;
 
     @Autowired
-    public BuildingServiceImpl(StringRedisTemplate redisTemplate,CampusCache campusCache, ApartmentIdService idService, CampusGroupDao campusGroupDao, BuildingDao buildingDao) {
+    public BuildingServiceImpl(CampusCache campusCache, ApartmentIdService idService, CampusGroupDao campusGroupDao, BuildingDao buildingDao) {
         this.campusGroupDao = campusGroupDao;
         this.buildingDao = buildingDao;
         this.idService = idService;
-        this.redisTemplate = redisTemplate;
         this.campusCache=campusCache;
     }
 
@@ -70,6 +69,30 @@ public class BuildingServiceImpl implements BuildingService {
         List<Building> buildingList = buildingDao.queryAllBuilding();
         buildingList.forEach(building -> res.add(new BuildingVO(building, campusGroupIdMap)));
         return res;
+    }
+
+    @Override
+    public int acquireBuildingNum() {
+      return   buildingDao.selectBuildingNum();
+    }
+
+    @Override
+    public List<String> acquireBuildingNames() {
+
+        return buildingDao.queryAllBuildingNames();
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void deleteSingleBuilding(String buildingName) {
+
+       Boolean res= buildingDao.queryBuildingRelateStatus(buildingName);
+
+       if (res!=null){
+           throw new BusinessParaException("存在与该楼名关联信息");
+       }
+        buildingDao.deleteBuildingByName(buildingName);
+
     }
 
     @Override

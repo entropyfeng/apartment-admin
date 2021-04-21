@@ -11,6 +11,7 @@ import com.github.entropyfeng.apartment.service.AuthUserService;
 import com.github.entropyfeng.common.config.anno.CurrentUserAnno;
 import com.github.entropyfeng.common.domain.CurrentUser;
 import com.github.entropyfeng.common.domain.Message;
+import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,6 @@ public class AccountController {
         this.authUserService = authUserService;
     }
 
-
     @GetMapping("/account/currentUser")
     public Message acquireCurrentUser(@ApiIgnore @CurrentUserAnno CurrentUser currentUser) {
 
@@ -40,13 +40,15 @@ public class AccountController {
         try {
             AuthUser authUser = authUserService.getAuthUserById(authUserId);
             List<String> roleNames= currentUser.getRoles();
-            String temp=roleNames.get(0);
-            CurrentUserVo currentUserVo = new CurrentUserVo(authUser.getAvatar(), authUser.getAuthUsername(), authUser.getAuthUserId().toString());
-            if (temp.equals("administrator")){
-                currentUserVo.setAccess("admin");
-            }else {
-                currentUserVo.setAccess(temp);
+
+            if (roleNames.contains("administrator")){
+                roleNames.remove("administrator");
+                roleNames.add("admin");
             }
+            CurrentUserVo currentUserVo = new CurrentUserVo(authUser.getAvatar(), authUser.getAuthUsername(), authUser.getAuthUserId().toString());
+            currentUserVo.setEmail(authUser.getEmail());
+            currentUserVo.setPhone(authUser.getPhone());
+            currentUserVo.addAccess(roleNames);
             message.addData("current_user", currentUserVo);
             message.setSuccess(true);
         } catch (AuthUserNotExistException e) {
@@ -54,6 +56,27 @@ public class AccountController {
         }
 
         return message;
+    }
+
+    @PutMapping("/account/my/password")
+    public Message resetMyPassword(@ApiIgnore @CurrentUserAnno CurrentUser currentUser, @RequestParam("prePassword")String prePassword,@RequestParam("postPassword")String postPassword){
+
+        authUserService.resetPassword(currentUser.getUserName(),prePassword,postPassword,false);
+        return Message.ok();
+    }
+    @PutMapping("/account/my/email")
+    public Message resetMyEmail(@ApiIgnore @CurrentUserAnno CurrentUser currentUser, @RequestParam("prePassword")String prePassword,@RequestParam("postPassword")String postPassword){
+
+
+        return Message.ok();
+    }
+
+    @PutMapping("/account/my/phone")
+    public Message resetMyPhone(@ApiIgnore @CurrentUserAnno CurrentUser currentUser, @RequestParam("prePassword")String prePassword,@RequestParam("postPhone")String postPhone){
+
+
+
+        return Message.ok();
     }
 
     @PutMapping("/account/currentUser")

@@ -20,7 +20,7 @@ public class AuthUserController {
     AuthUserService authUserService;
 
     @GetMapping("/auth/user/all")
-    public Message acquireAllUser(@Nullable @RequestParam("currentPage")Integer pageNo, @Nullable@RequestParam("pageSize")Integer pageSize) {
+    public Message acquireAllAuthUser(@Nullable @RequestParam("currentPage")Integer pageNo, @Nullable@RequestParam("pageSize")Integer pageSize) {
         Message message=new Message();
         List<AuthUser> userList;
         if (pageNo==null||pageSize==null){
@@ -37,4 +37,6 @@ public class AuthUserController {
         message.addData("auth_users",userList);
         return message;
     }
+
+
 }

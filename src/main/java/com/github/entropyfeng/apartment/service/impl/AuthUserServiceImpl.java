@@ -7,6 +7,7 @@ import com.github.entropyfeng.apartment.dao.AuthUserDao;
 import com.github.entropyfeng.apartment.domain.AccountStatus;
 import com.github.entropyfeng.apartment.domain.po.AuthRole;
 import com.github.entropyfeng.apartment.domain.po.AuthUser;
+import com.github.entropyfeng.apartment.domain.po.AuthUserRole;
 import com.github.entropyfeng.apartment.domain.to.PageRequest;
 import com.github.entropyfeng.apartment.domain.to.RegisterUserTo;
 import com.github.entropyfeng.apartment.exception.AuthRoleNotExistException;
@@ -31,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.validation.annotation.Validated;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
@@ -66,8 +68,7 @@ public class AuthUserServiceImpl implements AuthUserService {
 
 
     @Transactional(rollbackFor = Exception.class)
-    @Override
-    public void registerUser(@NotNull String authUsername, @NotNull String authPassword, String email, String phone, boolean enablePasswordCheck) {
+    public Long registerUser(String authUsername, String authPassword, String email, String phone, boolean enablePasswordCheck) {
 
 
         if (enablePasswordCheck) {
@@ -82,11 +83,21 @@ public class AuthUserServiceImpl implements AuthUserService {
         authPassword = PostHandlePassword.encryptPassword(authPassword);
         Long authUserId = authIdService.getNextAuthUserId();
         authUserDao.insertBaseAuthUser(authUserId, authUsername, authPassword, email, phone, AccountStatus.COMMON);
+        return authUserId;
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void batchRegisterUser(List<RegisterUserTo> registerUserTos) {
+    public void registerUser(@NotNull String authUsername, @NotNull String authPassword, String email, String phone, boolean enablePasswordCheck, List<String> roleList) {
+      Long authUserId=  registerUser(authUsername,authPassword,email,phone,enablePasswordCheck);
+      List<Long> userIds=new ArrayList<>();
+      userIds.add(authUserId);
+      grantRoleToUser(roleList,userIds);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void batchRegisterUser(@NotEmpty List<RegisterUserTo> registerUserTos,@NotEmpty List<String> roles) {
 
         if (registerUserTos == null || registerUserTos.isEmpty()) {
             if (logger.isWarnEnabled()) {
@@ -106,9 +117,39 @@ public class AuthUserServiceImpl implements AuthUserService {
         }).collect(Collectors.toList());
 
         authUserDao.insertBatchAuthUser(authUsers);
-
+        List<Long> roleIds= authRoleDao.queryAuthRoles(roles).stream().map(AuthRole::getAuthRoleId).collect(Collectors.toList());
+        List<Long> userIds=authUsers.stream().map(AuthUser::getAuthUserId).collect(Collectors.toList());
+        this.baseGrantRoleToUser(roleIds,userIds);
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void registerUser(@NotNull RegisterUserTo registerUserTo,List<String> roleList) {
+
+        registerUser(registerUserTo.getUsername(),registerUserTo.getPassword(),registerUserTo.getEmail(),registerUserTo.getPhone(),false,roleList);
+    }
+
+
+    @Transactional(rollbackFor = Exception.class)
+    public void grantRoleToUser(List<String> roleNames, List<Long> userIds){
+
+        List<Long> roleIds= authRoleDao.queryAuthRoles(roleNames).stream().map(AuthRole::getAuthRoleId).collect(Collectors.toList());
+        this.baseGrantRoleToUser(roleIds,userIds);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void baseGrantRoleToUser(List<Long> roleIds, List<Long> userIds){
+        List<AuthUserRole> userRoles=new ArrayList<>();
+        roleIds.forEach(roleId->{
+            userIds.forEach(userId->{
+                AuthUserRole temp=new AuthUserRole();
+                temp.setAuthRoleId(roleId);
+                temp.setAuthUserId(userId);
+                userRoles.add(temp);
+            });
+        });
+        authUserDao.insertBatchAuthUserRole(userRoles);
+    }
 
     @Override
     public void grantRoleToUser(String authUserName, String authRoleName) {
@@ -225,6 +266,7 @@ public class AuthUserServiceImpl implements AuthUserService {
         authUserDao.deleteAuthUserByAuthUserId(toDeleteUserId);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void deleteSingleUser(String toDeleteUsername) {
         authUserDao.deleteSingleUserByUsername(toDeleteUsername);
@@ -251,18 +293,20 @@ public class AuthUserServiceImpl implements AuthUserService {
 
     }
 
+
+
     @Override
-    public void resetPassword(@NotNull String authUsername, @NotNull String authPassword, @NotNull String newPassword, boolean enablePasswordValidate) {
+    public void resetPassword(@NotNull String authUsername, @NotNull String prePassword, @NotNull String postPassword,boolean enablePasswordValidate) {
 
         if (enablePasswordValidate) {
-            passwordValidator.validatePassword(newPassword);
+            passwordValidator.validatePassword(postPassword);
         }
         AuthUser authUser = authUserDao.queryAuthUserByAuthUsername(authUsername);
         if (authUser == null) {
             logger.warn("username {} not exist in reset password", authUsername);
             throw new AuthUserNotExistException(authUsername);
         }
-        String dataBasePassword = PostHandlePassword.encryptPassword(authPassword);
+        String dataBasePassword = PostHandlePassword.encryptPassword(prePassword);
         if (!dataBasePassword.equals(authUser.getAuthPassword())) {
             throw new PasswordErrorException(authUsername);
         }
@@ -270,7 +314,7 @@ public class AuthUserServiceImpl implements AuthUserService {
         if (logger.isInfoEnabled()) {
             logger.info("username {} reset password", authUsername);
         }
-        authUserDao.updatePasswordByName(authUsername, newPassword);
+        authUserDao.updatePasswordByName(authUsername, postPassword);
     }
 
 

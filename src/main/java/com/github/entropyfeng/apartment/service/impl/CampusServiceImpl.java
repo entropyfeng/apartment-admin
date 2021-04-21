@@ -17,9 +17,7 @@ public class CampusServiceImpl implements CampusService {
 
     private final CampusDao campusDao;
 
-
     private final CampusGroupDao campusGroupDao;
-
 
     private final ApartmentIdService idService;
     @Autowired
@@ -27,6 +25,16 @@ public class CampusServiceImpl implements CampusService {
         this.campusDao = campusDao;
         this.campusGroupDao = campusGroupDao;
         this.idService = idService;
+    }
+
+    @Override
+    public int acquireCampusNum() {
+        return campusDao.selectCampusCount();
+    }
+
+    @Override
+    public int acquireCampusGroupNum() {
+        return campusGroupDao.selectCampusGroupCount();
     }
 
     @Override
@@ -68,11 +76,19 @@ public class CampusServiceImpl implements CampusService {
     @Override
     public List<CampusGroup> queryAllCampusGroup() {
 
-
-
-
         return campusGroupDao.queryAllCampusGroup();
+    }
 
+    @Override
+    public List<String> acquireCampusNames() {
+
+       return campusDao.queryAllCampusName();
+
+    }
+
+    @Override
+    public List<String> acquireCampusGroupName() {
+        return campusGroupDao.queryAllCampusGroupNames();
     }
 
 }

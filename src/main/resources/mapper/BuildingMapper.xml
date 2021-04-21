@@ -37,6 +37,9 @@
   <update id="truncateBuilding">
     truncate table building
   </update>
+  <delete id="deleteBuildingByName">
+    delete from building where building_name=#{buildingName}
+  </delete>
 
   <select id="queryBuildingByBuildingName" resultMap="BaseResultMap"  resultType="com.github.entropyfeng.apartment.domain.po.Building">
     select <include refid="baseSql"/> from building where building_name=#{buildingName}
@@ -65,5 +68,17 @@
           resultMap="RelativeMapResultMap"
           resultType="com.github.entropyfeng.apartment.domain.to.BuildingAndGroup">
     select building_id,is_elevator,campus_name,campus_group_name,building_name from campus_group, building where building.building_id=#{buildingId} and campus_group.campus_group_id=building.campus_group_id
+  </select>
+    <select id="queryAllBuildingNames" resultType="java.lang.String">
+      select building_name from building
+    </select>
+  <select id="queryBuildingRelateStatus" resultType="java.lang.Boolean">
+    select 1 from building ,dormitory where building.building_name=#{buildingName} and building.building_name= dormitory.building_id
+  </select>
+  <select id="queryBuildingNamesByCampusGroupName" resultType="java.lang.String">
+    select building_name from building,campus_group where campus_group.campus_group_name=#{campusGroupName} and campus_group.campus_group_id=building.campus_group_id
+  </select>
+  <select id="selectBuildingNum" resultType="java.lang.Integer">
+    select count(building_id) from building
   </select>
 </mapper>

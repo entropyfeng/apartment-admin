@@ -1,7 +1,5 @@
 package com.github.entropyfeng.apartment.domain.vo;
 
-
-
 import com.github.entropyfeng.apartment.domain.Gender;
 import com.github.entropyfeng.apartment.domain.StudentAccountStatus;
 import com.github.entropyfeng.apartment.domain.StudentStatus;
@@ -15,7 +13,7 @@ public class StudentVO {
     private String studentName;
     private String idCardNumber;
     private String collegeName;
-    private StudentStatus studentStatus;
+    private String studentStatus;
     private String email;
     private String phone;
     private Gender gender;
@@ -26,7 +24,9 @@ public class StudentVO {
 
 
     //账号状态
-    private StudentAccountStatus studentAccountStatus;
+    private String studentAccountStatus;
+
+
     public StudentVO() {
     }
 
@@ -39,15 +39,15 @@ public class StudentVO {
         this.studentName = student.getStudentName();
         this.idCardNumber = student.getStudentName();
         if (student.getStudentStatus()==null){
-            this.studentStatus= StudentStatus.UNKNOWN;
+            this.studentStatus= StudentStatus.UNKNOWN.name();
         }else {
-            this.studentStatus = student.getStudentStatus();
+            this.studentStatus = student.getStudentStatus().name();
         }
 
         if (student.getStudentAccountStatus()==null){
-            this.studentAccountStatus=StudentAccountStatus.UNKNOWN;
+            this.studentAccountStatus=StudentAccountStatus.UNKNOWN.name();
         }else {
-            this.studentAccountStatus=student.getStudentAccountStatus();
+            this.studentAccountStatus=student.getStudentAccountStatus().name();
         }
 
         this.email = student.getEmail();
@@ -88,13 +88,6 @@ public class StudentVO {
     }
 
 
-    public StudentStatus getStudentStatus() {
-        return studentStatus;
-    }
-
-    public void setStudentStatus(StudentStatus studentStatus) {
-        this.studentStatus = studentStatus;
-    }
 
     public String getEmail() {
         return email;
@@ -147,12 +140,20 @@ public class StudentVO {
         this.description = description;
     }
 
-    
-    public StudentAccountStatus getStudentAccountStatus() {
+
+    public String getStudentStatus() {
+        return studentStatus;
+    }
+
+    public void setStudentStatus(String studentStatus) {
+        this.studentStatus = studentStatus;
+    }
+
+    public String getStudentAccountStatus() {
         return studentAccountStatus;
     }
 
-    public void setStudentAccountStatus(StudentAccountStatus studentAccountStatus) {
+    public void setStudentAccountStatus(String studentAccountStatus) {
         this.studentAccountStatus = studentAccountStatus;
     }
 

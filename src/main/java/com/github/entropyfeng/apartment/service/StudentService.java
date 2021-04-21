@@ -9,7 +9,14 @@ import java.util.List;
 
 public interface StudentService {
 
-    void createAccountForAllNonAccountStudent();
+    void createAccountForAllNonAccountStudent(int limit,List<String> roleNames);
+
+    void createAccountForNonAccountStudent(List<String> studentIds,List<String> roleNames);
+
+    void createAccountForSingleStudent(String studentId);
+
+    void modifyStudentPassword(String studentId,String newPassword);
+    void deleteAccountForSingleStudent(String studentId);
 
     void insertStudentByExcel(MultipartFile file)throws IOException;
 
@@ -17,5 +24,7 @@ public interface StudentService {
 
     void insertStudent(StudentTo student);
 
+    void deleteSingleStudent(String studentId);
+    void updateStudent(StudentTo studentTo);
     List<StudentVO> queryStudents();
 }

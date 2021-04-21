@@ -18,4 +18,5 @@ public interface CampusDao {
     Campus queryCampusByCampusName(@Param("campusName")String campusName);
     List<Campus> queryAllCampus();
     List<String> queryAllCampusName();
+    int selectCampusCount();
 }

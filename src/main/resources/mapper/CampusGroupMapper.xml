@@ -53,5 +53,14 @@
     select campus_group_name from campus_group where campus_name=#{campusName} and (in_gender=#{inGender} or in_gender=#{mix})
 
   </select>
+    <select id="queryAllCampusGroupNames" resultType="java.lang.String">
+      select campus_group_name from campus_group
+    </select>
+    <select id="queryCampusGroupNamesByCampusName" resultType="java.lang.String">
+      select campus_group_name from campus_group where campus_name=#{campusName}
+    </select>
+  <select id="selectCampusGroupCount" resultType="java.lang.Integer">
+    select count(campus_group_name) from campus_group
+  </select>
 
 </mapper>

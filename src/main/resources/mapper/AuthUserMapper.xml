@@ -2,6 +2,10 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.github.entropyfeng.apartment.dao.AuthUserDao">
 
+    <resultMap id="AuthUserRoleMap" type="com.github.entropyfeng.apartment.domain.po.AuthUserRole">
+        <result column="auth_role_id" property="authRoleId"/>
+        <result column="auth_user_id" property="authUserId"/>
+    </resultMap>
     <resultMap id="BaseResultMap" type="com.github.entropyfeng.apartment.domain.po.AuthUser">
         <id column="auth_user_id" property="authUserId"/>
         <result column="auth_username" property="authUsername"/>
@@ -35,6 +39,7 @@
         insert into auth_user_role(auth_user_id, auth_role_id)
         VALUES (#{authUserId}, #{authRoleId})
     </insert>
+
     <update id="truncateAuthUser">
         truncate table auth_user
     </update>
@@ -203,4 +208,12 @@
             (#{temp.authUserId},#{temp.authUsername},#{temp.authPassword},#{temp.email},#{temp.phone},#{temp.status})
         </foreach>
     </insert>
+    <insert id="insertBatchAuthUserRole" >
+
+insert into auth_user_role(auth_role_id, auth_user_id) VALUES
+<foreach collection="list" item="temp" index="index" separator=",">
+    (#{temp.authRoleId},#{temp.authUserId})
+</foreach>
+    </insert>
+
 </mapper>

@@ -14,6 +14,7 @@ public interface CollegeDao {
 
     void insertCollege(@Param("collegeId") Integer collegeId, @Param("collegeName") String collegeName);
 
+    void insertCollegeByDes(@Param("collegeId") Integer collegeId, @Param("collegeName") String collegeName,@Param("description")String description);
     void truncateCollege();
 
     void deleteCollegeByCollegeName(@Param("collegeName") String collegeName);
@@ -26,4 +27,5 @@ public interface CollegeDao {
 
     Boolean selectCollegeStatusByCollegeName(@Param("collegeName") String collegeName);
     List<College> queryAllCollege();
+    List<String> queryAllCollegeNames();
 }

@@ -17,6 +17,8 @@ public interface BuildingDao {
 
     void truncateBuilding();
 
+
+    int deleteBuildingByName(@Param("buildingName")String buildingName);
     Campus queryBuildingByBuildingName(@Param("buildingName")String buildingName);
 
     List<Building> queryAllBuilding();
@@ -29,8 +31,14 @@ public interface BuildingDao {
 
     Boolean queryBuildingExistByBuildingId(@Param("buildingId")Integer buildingId);
 
+    Boolean queryBuildingRelateStatus(@Param("buildingName")String buildingName);
+
     List<Building> queryAvailableBuilding(@Param("campusGroupName")String campusGroupName,@Param("inGender") InGender inGender);
 
+    List<String> queryBuildingNamesByCampusGroupName(@Param("campusGroupName")String campusGroupName);
     List<String> queryAvailableBuildingName(@Param("campusGroupName")String campusGroupName,@Param("inGender") InGender inGender);
 
+    List<String> queryAllBuildingNames();
+
+    int selectBuildingNum();
 }

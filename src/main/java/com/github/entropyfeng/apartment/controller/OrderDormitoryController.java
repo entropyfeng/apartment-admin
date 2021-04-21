@@ -1,13 +1,11 @@
 package com.github.entropyfeng.apartment.controller;
 
 import com.github.entropyfeng.apartment.domain.vo.DormitoryVO;
-import com.github.entropyfeng.apartment.exception.AlreadyCheckInException;
 import com.github.entropyfeng.apartment.service.OrderDormitoryService;
 import com.github.entropyfeng.common.config.anno.CurrentUserAnno;
 import com.github.entropyfeng.common.domain.CurrentUser;
 import com.github.entropyfeng.common.domain.Message;
 import com.github.entropyfeng.common.exception.BusinessException;
-import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,15 +32,15 @@ public class OrderDormitoryController {
         Message message = new Message();
         message.setSuccess(true);
         String username = currentUser.getUserName();
-        List<DormitoryVO> simpleDormitoryVOS = orderService.filterAvailableDormitory(username, buildingName);
+        List<DormitoryVO> simpleDormitoryVOS = orderService.filterAvailableDormitory(currentUser.getRoles(),username, buildingName);
         message.addData("dormitories", simpleDormitoryVOS);
         return message;
     }
 
     @GetMapping("/apartment/university/available/campus/names")
     public Message acquireAvailableCampusNames(@ApiIgnore @CurrentUserAnno CurrentUser currentUser) {
-        List<String> names = orderService.filterAvailableCampusName(currentUser.getUserName());
 
+        List<String> names = orderService.filterAvailableCampusName(currentUser.getRoles(),currentUser.getUserName());
         Message message = new Message();
         message.setSuccess(true);
         message.addData("isLeaf", false);
@@ -52,7 +50,7 @@ public class OrderDormitoryController {
 
     @GetMapping("/apartment/university/available/campusGroup/names")
     public Message acquireAvailableCampusGroupNames(@RequestParam("campusName") String campusName, @ApiIgnore @CurrentUserAnno CurrentUser currentUser) {
-        List<String> names = orderService.filterAvailableCampusGroup(currentUser.getUserName(), campusName);
+        List<String> names = orderService.filterAvailableCampusGroupName(currentUser.getRoles(),currentUser.getUserName(), campusName);
         Message message = new Message();
         message.setSuccess(true);
         message.addData("names", names);
@@ -63,7 +61,7 @@ public class OrderDormitoryController {
     @GetMapping("/apartment/university/available/building/names")
     public Message acquireAvailableBuildingNames(@RequestParam("campusGroupName") String campusGroupName, @ApiIgnore @CurrentUserAnno CurrentUser currentUser) {
 
-        List<String> names = orderService.filterAvailableBuildingName(currentUser.getUserName(), campusGroupName);
+        List<String> names = orderService.filterAvailableBuildingName(currentUser.getRoles(),currentUser.getUserName(), campusGroupName);
         Message message = new Message();
         message.setSuccess(true);
         message.addData("names", names);

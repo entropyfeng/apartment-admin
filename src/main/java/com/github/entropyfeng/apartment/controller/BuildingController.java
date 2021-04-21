@@ -5,6 +5,7 @@ import com.github.entropyfeng.apartment.service.BuildingService;
 import com.github.entropyfeng.common.domain.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,7 +14,7 @@ import java.util.List;
 public class BuildingController {
 
 
-    private static final Logger logger= LoggerFactory.getLogger(BuildingController.class);
+    private static final Logger logger = LoggerFactory.getLogger(BuildingController.class);
     private final BuildingService buildingService;
 
     public BuildingController(BuildingService buildingService) {
@@ -21,24 +22,43 @@ public class BuildingController {
     }
 
     @GetMapping("/apartment/building/all")
-    public Message acquireAllBuilding(){
-       List<BuildingVO> buildingVOS= buildingService.acquireAllBuildings();
-       Message message=new Message();
-       message.setSuccess(true);
-       message.addData("buildings",buildingVOS);
-       return message;
+    public Message acquireAllBuilding() {
+        Message message = new Message();
+        message.setSuccess(true);
+
+        List<BuildingVO> buildingVOS = buildingService.acquireAllBuildings();
+        message.addData("buildings", buildingVOS);
+
+        return message;
+    }
+
+    @DeleteMapping("/apartment/building")
+    public Message deleteSingleBuilding(@RequestParam("buildingName") String buildingName) {
+
+        buildingService.deleteSingleBuilding(buildingName);
+        return Message.ok();
+
+    }
+
+    @GetMapping("/apartment/building/names")
+    public Message acquireBuildingNames() {
+
+        Message message = new Message();
+        List<String> names = buildingService.acquireBuildingNames();
+        message.addData("names", names);
+        return message;
     }
 
     @PostMapping("/apartment/building")
-    public Message addNewBuilding(@RequestBody BuildingVO buildingVO){
-        Message message=new Message();
-        boolean success=false;
+    public Message addNewBuilding(@RequestBody BuildingVO buildingVO) {
+        Message message = new Message();
+        boolean success = false;
         try {
             buildingService.addNewBuilding(buildingVO);
-            success=true;
-        }catch (IllegalArgumentException e){
+            success = true;
+        } catch (IllegalArgumentException e) {
             message.setMsg("argument error");
-            logger.error("buildingVO argument error {}",buildingVO);
+            logger.error("buildingVO argument error {}", buildingVO);
         }
 
 

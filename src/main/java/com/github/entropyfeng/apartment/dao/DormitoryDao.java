@@ -7,6 +7,7 @@ import io.swagger.models.auth.In;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.Date;
 import java.util.List;
@@ -33,7 +34,14 @@ public interface DormitoryDao {
 
     int insertSelective(Dormitory record);
 
+    int deleteDormitoryByDormitoryName(@Param("dormitoryName")String dormitoryName);
+
+    int selectDormitoryNum();
+    int selectResidentNum();
+    int selectBedNum();
+    int selectBedNumByGender(@Param("inGender")InGender inGender);
     List<Dormitory> queryDormitoryByBuildingId(@Param("buildingId") Integer buildingId);
+    List<Dormitory> queryDormitoryByBuildingName(@Param("buildingName") String buildingName);
 
     List<Dormitory> queryFilterDormitoryByBuildingName(@Param("buildingName")String buildingName,@Param("inGender") InGender inGender);
 

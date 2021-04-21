@@ -5,6 +5,7 @@ package com.github.entropyfeng.apartment.dao;
 import com.github.entropyfeng.apartment.domain.AccountStatus;
 import com.github.entropyfeng.apartment.domain.po.AuthRole;
 import com.github.entropyfeng.apartment.domain.po.AuthUser;
+import com.github.entropyfeng.apartment.domain.po.AuthUserRole;
 import com.github.entropyfeng.apartment.domain.to.PageRequest;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -61,6 +62,8 @@ public interface AuthUserDao {
      */
     Long grantRoleToUser(@Param("authUserId") Long authUserId, @Param("authRoleId")Long authRoleId);
 
+
+    Long insertBatchAuthUserRole(@Param("list")List<AuthUserRole> list);
     /**
      * 删除{@link AuthUser}与{@link AuthRole}的关系
      * @param authUserId authUserId {@link AuthUser}

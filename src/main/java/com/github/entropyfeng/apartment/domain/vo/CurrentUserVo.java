@@ -2,6 +2,9 @@ package com.github.entropyfeng.apartment.domain.vo;
 
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class CurrentUserVo {
 
     String avatar;
@@ -13,7 +16,7 @@ public class CurrentUserVo {
     String phone;
     String title;
     String userid;
-    String access;
+    List<String> access=new ArrayList<>();
     String signature;
     String group;
     Integer unreadCount;
@@ -86,14 +89,21 @@ public class CurrentUserVo {
         this.userid = userid;
     }
 
-    public String getAccess() {
+
+    public List<String> getAccess() {
         return access;
     }
 
-    public void setAccess(String access) {
+    public void setAccess(List<String> access) {
         this.access = access;
     }
 
+    public void addAccess(String temp){
+        access.add(temp);
+    }
+    public void addAccess(List<String> temp){
+        access.addAll(temp);
+    }
     public String getSignature() {
         return signature;
     }

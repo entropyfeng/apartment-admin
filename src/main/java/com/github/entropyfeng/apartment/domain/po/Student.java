@@ -51,12 +51,12 @@ public class Student implements Serializable, ChineseIdCardAdvice, UsernameAdvic
         this.studentId = studentVO.getStudentId();
         this.studentName = studentVO.getStudentName();
         this.idCardNumber = studentVO.getIdCardNumber();
-        this.studentStatus = studentVO.getStudentStatus();
+        this.studentStatus = StudentStatus.valueOf(studentVO.getStudentStatus());
         this.email =studentVO.getEmail();
         this.phone = studentVO.getPhone();
         this.gender = studentVO.getGender();
         this.collegeId = collegeNameIdMap.get(studentVO.getCollegeName());
-        this.studentAccountStatus = studentVO.getStudentAccountStatus();
+        this.studentAccountStatus = StudentAccountStatus.valueOf(studentVO.getStudentAccountStatus());
         this.registerYear = studentVO.getRegisterYear();
         this.description = studentVO.getDescription();
     }
