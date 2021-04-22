@@ -105,6 +105,8 @@ public class InitAuthTest {
         authResourceService.addNewResource("deleteSingleDormitory", "DELETE", "/apartment/dormitory");
         authResourceService.addNewResource("acquireAllCampusGroup", "GET", "/apartment/campusGroup/all");
 
+        authResourceService.addNewResource("acquireApartmentBaseInfo","GET","/apartment/base/info");
+
         authResourceService.addNewResource("acquireAllDormitory","GET","/apartment/dormitory/all");
         authResourceService.addNewResource("acquireDormitoryByBuildingId","GET","/apartment/dormitory");
         authResourceService.addNewResource("acquireDetailDormitory","GET","/apartment/detail/dormitory");
@@ -160,6 +162,7 @@ public class InitAuthTest {
         authRoleService.grantResourceToRole("administrator", "acquireCurrentCampusNames");
         authRoleService.grantResourceToRole("administrator", "acquireCurrentCampusGroupNames");
 
+        authRoleService.grantResourceToRole("administrator","acquireApartmentBaseInfo" );
 
         authRoleService.grantResourceToRole("administrator", "acquireAllStudent");
         authRoleService.grantResourceToRole("administrator", "acquireAllCollege");

@@ -43,7 +43,8 @@ public class ApartmentInfoController {
         message.addData("dormitoryNum",dormitoryService.acquireDormitoryNum());
         message.addData("bedNum",dormitoryService.acquireBedNum());
         message.addData("manBedNum",dormitoryService.acquireManBedNum());
-        message.addData("woManBedNum",dormitoryService.acquireWomanBedNum());
+        message.addData("womanBedNum",dormitoryService.acquireWomanBedNum());
+        message.addData("currentResident",dormitoryService.acquireResidentNum());
         return message;
     }
 }
