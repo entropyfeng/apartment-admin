@@ -10,14 +10,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.stereotype.Component;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@Component
 public class InitAuthTest {
 
     private static final Logger logger= LoggerFactory.getLogger(InitAuthTest.class);
@@ -57,7 +58,7 @@ public class InitAuthTest {
 
 
     @Test
-    public void test() {
+    public void init() {
 
         clearAll();
 
@@ -115,6 +116,8 @@ public class InitAuthTest {
         authResourceService.addNewResource("acquireAvailableCampusGroupNames","GET","/apartment/university/available/campusGroup/names");
         authResourceService.addNewResource("acquireAvailableBuildingNames","GET","/apartment/university/available/building/names");
         authResourceService.addNewResource("acquireAvailableDormitory","GET","/apartment/university/available/dormitories");
+        authResourceService.addNewResource("checkInDormitory","POST","/apartment/checkIn");
+        authResourceService.addNewResource("checkOutDormitory","POST","/apartment/checkOut");
         authResourceService.addNewResource("checkInMyDormitory","POST","/apartment/my/checkIn");
         authResourceService.addNewResource("checkOutMyDormitory","POST","/apartment/my/checkOut");
         authResourceService.addNewResource("acquireMyDormitoryStatus","GET","/apartment/my/status");
@@ -125,6 +128,7 @@ public class InitAuthTest {
         authResourceService.addNewResource("addSingleCollege","POST","/university/college");
         authResourceService.addNewResource("addSingleStudent","POST","/university/student");
         authResourceService.addNewResource("modifySingleStudent","PUT","/university/student");
+        authResourceService.addNewResource("querySingleStudent","GET","/university/student");
         authResourceService.addNewResource("deleteSingleCollege","DELETE","/university/college");
         authResourceService.addNewResource("insertStudentsFromExcel","POST","/university/student/excel");
         authResourceService.addNewResource("deleteSingleStudent","DELETE","/university/student");
@@ -180,11 +184,14 @@ public class InitAuthTest {
         authRoleService.grantResourceToRole("administrator","deleteSingleCollege");
         authRoleService.grantResourceToRole("administrator","addSingleCollege");
         authRoleService.grantResourceToRole("administrator","addSingleStudent");
+        authRoleService.grantResourceToRole("administrator","querySingleStudent");
         authRoleService.grantResourceToRole("administrator","modifySingleStudent");
         authRoleService.grantResourceToRole("administrator","acquireCurrentCollegeNames");
         authRoleService.grantResourceToRole("administrator","deleteSingleStudentAccount");
         authRoleService.grantResourceToRole("administrator","createSingleStudentAccount");
         authRoleService.grantResourceToRole("administrator","modifyStudentPassword");
+        authRoleService.grantResourceToRole("administrator","checkInDormitory");
+        authRoleService.grantResourceToRole("administrator","checkOutDormitory");
 
 
         authRoleService.grantResourceToRole("student", "acquireCurrentUser");

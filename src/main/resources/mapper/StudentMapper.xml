@@ -11,7 +11,7 @@
         <result column="email" property="email"/>
         <result column="register_year" property="registerYear"/>
         <result column="student_status" property="studentStatus"/>
-        <result column="acc_status" property="studentAccountStatus"/>
+        <result column="acc_status" property="accountStatus"/>
         <result column="student_description" property="description"/>
         <result column="create_time" property="createTime"/>
         <result column="update_time" property="updateTime"/>
@@ -26,13 +26,30 @@
         <result column="email" property="email"/>
         <result column="register_year" property="registerYear"/>
     </resultMap>
+    <resultMap id="SimpleStudentInfoMap" type="com.github.entropyfeng.apartment.domain.vo.SimpleStudentInfo">
+        <id column="student_id" property="studentId"/>
+        <result column="student_name" property="studentName"/>
+        <result column="college_name" property="collegeName"/>
+        <result column="gender" property="gender"/>
+        <result column="register_year" property="registerYear"/>
+    </resultMap>
 
+    <sql id="simpleStudentSql">
+        student
+        .
+        student_id
+        , college.college_name,student.student_name, student.gender,student.register_year
+    </sql>
     <sql id="studentToSql">
-        student.student_id, college.college_name,student.student_name, student.gender, student.id_card_number,student.phone, student.email,student.register_year
+        student
+        .
+        student_id
+        , college.college_name,student.student_name, student.gender, student.id_card_number,student.phone, student.email,student.register_year
     </sql>
 
     <sql id="baseSql">
-        student_id, student_name, college_id, college_id,acc_status,  id_card_number, gender, phone, email, student_status,register_year,student_description,create_time,update_time
+        student_id
+        , student_name, college_id, college_id,acc_status,  id_card_number, gender, phone, email, student_status,register_year,student_description,create_time,update_time
     </sql>
 
     <insert id="insertStudentContainsCollege">
@@ -45,7 +62,7 @@
                              email, phone, register_year, student_description)
         values (#{student.studentId}, #{student.studentName}, #{student.idCardNumber},
                 #{student.collegeId}, #{student.gender},
-                #{student.studentStatus}, #{student.studentAccountStatus},
+                #{student.studentStatus}, #{student.accountStatus},
                 #{student.email}, #{student.phone}, #{student.registerYear}, #{student.description});
     </insert>
     <insert id="insertBatchStudent" parameterType="java.util.List">
@@ -153,6 +170,103 @@
         select student_id
         from student
     </select>
+    <select id="queryStudentByEmail" resultMap="BaseResultMap"
+            resultType="com.github.entropyfeng.apartment.domain.po.Student">
+
+        select
+        <include refid="baseSql"/>
+        from student where email=#{email}
+
+    </select>
+    <select id="queryStudentByPhone" resultMap="BaseResultMap"
+            resultType="com.github.entropyfeng.apartment.domain.po.Student">
+
+
+        select<include refid="baseSql"/>from student where phone=#{phone}
+
+    </select>
+    <select id="queryStudentByIdCardNumber" resultMap="BaseResultMap"
+            resultType="com.github.entropyfeng.apartment.domain.po.Student">
+        select<include refid="baseSql"/>from student where id_card_number=#{idCardNumber}
+    </select>
+    <select id="querySimpleStudentInfoList"
+            resultMap="SimpleStudentInfoMap"
+            resultType="com.github.entropyfeng.apartment.domain.vo.SimpleStudentInfo">
+
+        select
+        <include refid="simpleStudentSql"/>
+        from student,college where
+        student.college_id=college.college_id and student.student_id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+
+    </select>
+    <select id="querySimpleStudentAnd"
+            resultMap="SimpleStudentInfoMap"
+            resultType="com.github.entropyfeng.apartment.domain.vo.SimpleStudentInfo">
+        select
+        <include refid="simpleStudentSql"/>
+        from student,college
+        <choose>
+            <when test="studentId != null">
+                where student.student_id=#{studentId} and student.college_id=college.college_id
+            </when>
+            <otherwise>
+
+                <where>
+                  <if test="studentName !=null">
+                      and student.student_name=#{studentName}
+                  </if>
+                    <if test="collegeName != null">
+                        and college.college_name=#{collegeName}
+                    </if>
+                    <if test="gender != null">
+                        and student.gender=#{gender}
+                    </if>
+                    <if test="registerYear != null">
+                        and student.register_year=#{registerYear}
+                    </if>
+                    and student.college_id=college.college_id
+                </where>
+            </otherwise>
+        </choose>
+
+    </select>
+    <select id="querySimpleStudentOr"
+            resultType="com.github.entropyfeng.apartment.domain.vo.SimpleStudentInfo">
+        select
+        <include refid="simpleStudentSql"/>
+        from student,college
+        <choose>
+            <when test="studentId != null or collegeName !=null or gender !=null or registerTear !=null or studentName !=null">
+                <where>
+                    (
+                    <if test="studentId != null">
+                        student.student_id=#{studentId}
+                    </if>
+                    <if test="studentName !=null">
+                        or student.student_name=#{studentName}
+                    </if>
+                    <if test="collegeName != null">
+                        or college.college_name=#{collegeName}
+                    </if>
+                    <if test="gender != null">
+                        or student.gender=#{gender}
+                    </if>
+                    <if test="registerYear != null">
+                        or student.register_year=#{registerYear}
+                    </if>
+
+                    )
+                    and student.college_id=college.college_id
+                </where>
+            </when>
+            <otherwise>
+                where student.college_id=college.college_id
+            </otherwise>
+        </choose>
+    </select>
 
 
     <update id="updateByStudentIdSelective" parameterType="com.github.entropyfeng.apartment.domain.po.Student">
@@ -183,6 +297,12 @@
                 student_description = #{studentDescription,jdbcType=VARCHAR},
             </if>
         </set>
-        where student_id = #{student,jdbcType=INTEGER}
+        where student_id = #{studentId,jdbcType=INTEGER}
     </update>
+    <update id="updateStudentAccountStatus">
+        update student
+        set acc_status =#{accountStatus}
+        where student_id = #{studentId}
+    </update>
+
 </mapper>

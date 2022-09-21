@@ -12,13 +12,14 @@ public class StudentExcelListener extends AnalysisEventListener<StudentExcel> {
         this.studentList = studentList;
     }
 
-    private List<StudentTo> studentList;
+    private final List<StudentTo> studentList;
     @Override
     public void invoke(StudentExcel data, AnalysisContext context) {
 
         StudentTo studentTo=new StudentTo(data.getStudentId(),data.getStudentName(),data.getIdCardNumber(),data.getEmail(),data.getPhone(),data.getGender(),data.getCollegeName(),data.getRegisterYear());
         studentList.add(studentTo);
     }
+
 
     @Override
     public void doAfterAllAnalysed(AnalysisContext context) {

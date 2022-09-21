@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.entropyfeng.apartment.dao.ApartmentScheduleDao">
+
+
+    <resultMap id="StudentIdMap" type="java.lang.Object">
+        <result column="target_student_id"  javaType="java.lang.String" typeHandler="com.github.entropyfeng.apartment.domain.JsonListHandler"/>
+    </resultMap>
+
+    <resultMap id="ScheduleTimeMap" type="com.github.entropyfeng.apartment.domain.to.ScheduleTimeInfo">
+        <id column="schedule_name" property="scheduleName"/>
+        <result column="end_time" property="endTime"/>
+        <result column="begin_time" property="beginTime"/>
+    </resultMap>
+
+    <resultMap id="BaseResultMap" type="com.github.entropyfeng.apartment.domain.po.ApartmentSchedule">
+
+        <id column="schedule_name" property="scheduleName"/>
+        <result column="schedule_year" property="scheduleYear"/>
+        <result column="schedule_description" property="description"/>
+        <result column="target_student_num" property="targetStudentNum"/>
+        <result column="target_bed_num" property="targetBedNum"/>
+        <result column="end_time" property="endTime"/>
+        <result column="begin_time" property="beginTime"/>
+        <result column="enable_schedule" property="scheduleEnable"/>
+        <result column="target_apartment" property="targetApartment" javaType="com.github.entropyfeng.apartment.domain.po.CampusGroupBlock"  typeHandler="com.github.entropyfeng.apartment.domain.JsonListHandler"/>
+        <result column="target_student_id" property="targetStudentId" javaType="java.lang.String" typeHandler="com.github.entropyfeng.apartment.domain.JsonListHandler"/>
+        <result column="target_student_gender" property="targetStudentGender" />
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+
+    </resultMap>
+
+    <sql id="baseSql">
+        schedule_name,schedule_year,enable_schedule,schedule_description,target_student_num,target_bed_num,end_time,begin_time,target_apartment,target_student_id,target_student_gender,create_time,update_time
+    </sql>
+    <sql id="timeSchedule">
+        schedule_name,begin_time,end_time
+    </sql>
+    <insert id="insertApartmentSchedule">
+        insert into apartment_schedule(schedule_name,target_student_id)values (#{scheduleName},#{json,javaType=java.lang.String, typeHandler = com.github.entropyfeng.apartment.domain.JsonListHandler})
+    </insert>
+    <insert id="insertTargetApartment">
+        insert into apartment_schedule(schedule_name,target_apartment)values (#{scheduleName},#{json,javaType=com.github.entropyfeng.apartment.domain.po.CampusGroupBlock, typeHandler = com.github.entropyfeng.apartment.domain.JsonListHandler})
+    </insert>
+    <insert id="initApartmentSchedule">
+        insert into  apartment_schedule(schedule_name,schedule_year,begin_time,end_time,target_student_gender,target_student_id,target_bed,target_apartment,target_result) values (#{scheduleName},#{year},#{beginTime},#{endTime},#{gender},JSON_ARRAY(),JSON_ARRAY(),JSON_ARRAY(),JSON_ARRAY())
+    </insert>
+    <update id="truncateApartmentSchedule">
+        truncate table  apartment_schedule
+    </update>
+    <update id="extendScheduleStudentId">
+        update apartment_schedule set target_student_id= json_merge(target_student_id,#{toExtendIds,javaType=java.lang.String, typeHandler = com.github.entropyfeng.apartment.domain.JsonListHandler})
+    </update>
+    <update id="reconstructTargetApartment">
+        update  apartment_schedule set target_apartment=#{json,javaType=com.github.entropyfeng.apartment.domain.po.CampusGroupBlock, typeHandler = com.github.entropyfeng.apartment.domain.JsonListHandler} where schedule_name=#{scheduleName}
+    </update>
+    <update id="extendTargetDorBed">
+        update apartment_schedule set target_bed=json_merge(target_bed,#{toExtendIds,javaType=java.lang.String, typeHandler = com.github.entropyfeng.apartment.domain.JsonListHandler})
+    </update>
+    <update id="updateScheduleEnable">
+        update apartment_schedule set enable_schedule=#{scheduleEnable} where schedule_name=#{scheduleName}
+    </update>
+    <select id="queryTargetStudentId"  resultMap="BaseResultMap">
+        select target_student_id from apartment_schedule where schedule_name=#{scheduleName}
+    </select>
+    <select id="queryTargetApartment"   resultMap="BaseResultMap">
+        select target_apartment from apartment_schedule where schedule_name=#{scheduleName}
+    </select>
+    <select id="queryApartmentSchedule"
+            resultMap="BaseResultMap"
+            resultType="com.github.entropyfeng.apartment.domain.po.ApartmentSchedule">
+        select <include refid="baseSql"/> from apartment_schedule where schedule_name=#{scheduleName}
+    </select>
+    <select id="queryAllApartmentSchedule"
+            resultMap="BaseResultMap"
+            resultType="com.github.entropyfeng.apartment.domain.po.ApartmentSchedule">
+        select <include refid="baseSql"/> from apartment_schedule
+    </select>
+    <select id="queryAvailableScheduleTimeInfo"
+            resultType="com.github.entropyfeng.apartment.domain.to.ScheduleTimeInfo">
+        select schedule_name,begin_time,end_time from apartment_schedule where enable_schedule and end_time>current_date
+    </select>
+    <select id="queryAvailableStudentSchedule" resultType="java.lang.String">
+        select schedule_name from apartment_schedule where end_time>current_time and JSON_CONTAINS(target_student_id,JSON_ARRAY(#{studentId}))
+    </select>
+    <select id="queryHasDormitory" resultType="java.lang.Boolean">
+
+    select json_contains(target_result,#{studentId}) from apartment_schedule where schedule_name=#{scheduleName}
+    </select>
+    <select id="queryIsInSchedule" resultType="java.lang.Boolean">
+        select json_contains(target_student_id,JSON_ARRAY(#{studentId}))  from apartment_schedule where schedule_name=#{scheduleName} and json_contains(target_bed,JSON_ARRAY(#{studentId}))
+    </select>
+    <select id="queryAllAvailableApartmentSchedule"
+            resultMap="BaseResultMap"
+            resultType="com.github.entropyfeng.apartment.domain.po.ApartmentSchedule">
+        select <include refid="baseSql"/> from apartment_schedule where enable_schedule
+    </select>
+    <select id="queryScheduleTimeInfoByScheduleName"
+            resultType="com.github.entropyfeng.apartment.domain.to.ScheduleTimeInfo">
+        select <include refid="timeSchedule"/> from apartment_schedule where schedule_name=#{scheduleName}
+    </select>
+    <select id="queryStudentListJson" resultType="java.lang.String">
+        select target_student_id from apartment_schedule where schedule_name=#{scheduleName}
+    </select>
+    <select id="queryTargetScheduleGender" resultType="com.github.entropyfeng.apartment.domain.Gender">
+        select target_student_gender from apartment_schedule where schedule_name=#{scheduleName}
+    </select>
+    <select id="queryTargetScheduleYear" resultType="java.lang.String">
+        select schedule_year from apartment_schedule where schedule_name=#{scheduleName}
+    </select>
+
+</mapper>

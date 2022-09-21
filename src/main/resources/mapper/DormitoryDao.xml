@@ -18,6 +18,7 @@
     </resultMap>
 
 
+
     <sql id="baseSql">
         dormitory_id ,building_id,dormitory_name, floor ,in_gender,total_capacity,current_capacity,dormitory_direction,dormitory_description,version,create_time,update_time
     </sql>
@@ -37,9 +38,9 @@
     </sql>
     <insert id="insertDormitory" useGeneratedKeys="true">
         insert into dormitory(dormitory_id, building_id, dormitory_name, floor,
-                              in_gender, total_capacity, dormitory_direction, dormitory_description)
+                              in_gender, total_capacity, dormitory_direction, dormitory_description,target_resident)
         VALUES (#{dormitoryId}, #{buildingId}, #{dormitoryName}, #{floor},
-                #{inGender}, #{totalCapacity}, #{dormitoryDirection}, #{description})
+                #{inGender}, #{totalCapacity}, #{dormitoryDirection}, #{description},#{targetResident,javaType=com.github.entropyfeng.apartment.domain.po.ResidentBlock, typeHandler = com.github.entropyfeng.apartment.domain.JsonObjectHandler})
     </insert>
 
     <insert id="insertSelective" parameterType="com.github.entropyfeng.apartment.domain.po.Dormitory" useGeneratedKeys="true">
@@ -109,6 +110,12 @@
             </if>
         </trim>
     </insert>
+
+    <insert id="initTargetResident">
+    update dormitory set target_resident =#{residentBlock,javaType=com.github.entropyfeng.apartment.domain.po.ResidentBlock, typeHandler = com.github.entropyfeng.apartment.domain.JsonObjectHandler} where dormitory_id=#{dormitoryId}
+    </insert>
+
+
     <update id="truncateDormitory">
         truncate table dormitory
     </update>
@@ -123,6 +130,23 @@
                                                 dormitory.dormitory_id=#{dormitoryId}
 
     </update>
+     <!--update dormitory set target_resident=json_replace(target_resident,'$[0].residentId','edadqwe77','$[0].time',CURRENT_TIME) where dormitory_id=1
+     update dormitory set target_resident=json_replace(target_resident,'$[0].residentId', #{residentId}) where dormitory_id=#{dormitoryId}
+     update dormitory set target_resident= json_replace(target_resident,replace(json_unquote(json_search(target_resident,'one',#{bedId})),'bedId','residentId'),#{residentId}) where dormitory_id=#{dormitoryId}  and json_unquote(json_extract(target_resident,replace(json_unquote(json_search(target_resident,'one',#{bedId})),'bedId','residentId')))='null'
+-->
+
+   <!--update dormitory set  target_resident=json_replace(target_resident,'$.residentIds[2]','7sd7dqasdff','$.checkInTimes[2]',CURRENT_TIMESTAMP) where dormitory_id=2 and json_contains(target_resident->'$.bedIds',CAST(2 as JSON)) and  target_resident->'$.residentIds[2]'='2_2'
+-->
+    <update id="checkInTargetResident">
+        update dormitory set current_capacity=current_capacity+1, target_resident=json_replace(target_resident,concat('$.residentIds[',#{bedId},']'),#{residentId},concat('$.checkInTimes[',#{bedId},']'),CURRENT_TIMESTAMP)
+        where dormitory_id=#{dormitoryId} and json_contains(target_resident->'$.bedIds',CAST(#{bedId} as JSON)) and  json_extract( target_resident,concat('$.residentIds[',#{bedId},']'))=concat(#{dormitoryId},'_',#{bedId})
+
+    </update>
+    <update id="checkOutTargetResident">
+        update dormitory set current_capacity=current_capacity-1, target_resident=json_replace(target_resident,concat('$.residentIds[',#{bedId},']'),concat(#{dormitoryId},'_',#{bedId}),concat('$.checkInTimes[',#{bedId},']'),null)
+        where dormitory_id=#{dormitoryId} and json_contains(target_resident->'$.bedIds',CAST(#{bedId} as JSON)) and  json_extract(target_resident,concat('$.residentIds[',#{bedId},']'))!=concat(#{dormitoryId},'_',#{bedId})
+    </update>
+
     <delete id="deleteDormitoryByDormitoryName">
         delete  from dormitory where dormitory_name=#{dormitoryName}
     </delete>
@@ -194,5 +218,34 @@
     <select id="selectBedNumByGender" resultType="java.lang.Integer">
         select sum(total_capacity) from dormitory where in_gender=#{inGender}
     </select>
+    <select id="queryBatchDormitory" resultType="com.github.entropyfeng.apartment.domain.po.Dormitory">
+        select <include refid="baseSql"/> from dormitory where dormitory_id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+    <select id="selectCampusGroupNameByDormitoryId" resultType="java.lang.String">
+        select campus_group.campus_group_name from dormitory,building,campus_group where dormitory.dormitory_id=#{dormitoryId} and  dormitory.building_id=building.building_id and building.campus_group_id=campus_group.campus_group_id
+    </select>
+    <select id="selectCampusGroupIdByDormitoryId" resultType="java.lang.Integer">
+        select building.campus_group_id from dormitory,building where dormitory.dormitory_id=#{dormitoryId} and dormitory.building_id=building.building_id
+    </select>
+    <select id="selectBuildingNameByDormitoryId" resultType="java.lang.String">
+       select building.building_name from dormitory,building where dormitory.dormitory_id=#{dormitoryId} and dormitory.building_id=building.building_id
+    </select>
+    <select id="selectBuildingIdByDormitoryId" resultType="java.lang.Integer">
+        select building_id from dormitory where dormitory_id=#{dormitoryId}
+    </select>
+    <select id="selectDormitoryNameByDormitoryId" resultType="java.lang.String">
+        select dormitory_name from dormitory where dormitory_id=#{dormitoryId}
+    </select>
+
+    <select id="queryTotalCapacity" resultType="java.lang.Integer">
+        select total_capacity from dormitory where dormitory_id=#{dormitoryId}
+    </select>
+    <select id="queryExistResident" resultType="java.lang.Integer">
+        select 1 from dormitory where #{residentId} member of (json_extract(target_resident,'$.residentIds'))
+    </select>
+
 
 </mapper>

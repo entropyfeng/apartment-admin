@@ -2,7 +2,9 @@ package com.github.entropyfeng.apartment.domain.excel;
 
 import com.alibaba.excel.annotation.ExcelProperty;
 
-public class StudentExcel   {
+
+
+public class StudentExcel  {
 
     @ExcelProperty("学号")
     private String studentId;

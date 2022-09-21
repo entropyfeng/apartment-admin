@@ -22,14 +22,14 @@ public class DormitoryDirectionTypeHandler implements TypeHandler<DormitoryDirec
     @Override
     public DormitoryDirection getResult(ResultSet resultSet, String s) throws SQLException {
         Integer code = resultSet.getInt(s);
-        return DormitoryDirection.getInGenderByCode(code);
+        return DormitoryDirection.getDormitoryDirectionByCode(code);
 
     }
 
     @Override
     public DormitoryDirection getResult(ResultSet resultSet, int i) throws SQLException {
         Integer code = resultSet.getInt(i);
-        return DormitoryDirection.getInGenderByCode(code);
+        return DormitoryDirection.getDormitoryDirectionByCode(code);
 
 
     }
@@ -37,7 +37,7 @@ public class DormitoryDirectionTypeHandler implements TypeHandler<DormitoryDirec
     @Override
     public DormitoryDirection getResult(CallableStatement callableStatement, int i) throws SQLException {
         Integer code = callableStatement.getInt(i);
-        return DormitoryDirection.getInGenderByCode(code);
+        return DormitoryDirection.getDormitoryDirectionByCode(code);
 
     }
 

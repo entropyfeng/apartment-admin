@@ -4,9 +4,9 @@ import com.github.entropyfeng.apartment.domain.DormitoryDirection;
 import com.github.entropyfeng.apartment.domain.InGender;
 
 import java.util.Date;
+import java.util.List;
 
 public class Dormitory {
-
 
     private Integer dormitoryId;
 
@@ -32,6 +32,7 @@ public class Dormitory {
 
     private Date updateTime;
 
+    private ResidentBlock targetResident;
 
     public Integer getDormitoryId() {
         return dormitoryId;
@@ -119,6 +120,14 @@ public class Dormitory {
 
     public void setCurrentCapacity(Integer currentCapacity) {
         this.currentCapacity = currentCapacity;
+    }
+
+    public ResidentBlock getTargetResident() {
+        return targetResident;
+    }
+
+    public void setTargetResident(ResidentBlock targetResident) {
+        this.targetResident = targetResident;
     }
 
     public Long getVersion() {

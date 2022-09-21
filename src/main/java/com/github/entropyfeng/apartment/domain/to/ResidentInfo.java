@@ -9,6 +9,8 @@ public class ResidentInfo {
 
     private String residentId;
 
+    private String dormitoryName;
+
     private Integer bedId;
 
     private String residentName;

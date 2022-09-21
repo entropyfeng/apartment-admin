@@ -42,6 +42,8 @@ public interface DormitoryResidentDao {
 
     Integer updateInDormitoryRelyDoubleVersion(@Param("dormitoryId") Integer dormitoryId,  @Param("bedId")Integer bedId,@Param("residentId") String residentId,@Param("dormitoryVersion")Long dormitoryVersion,@Param("residentVersion")Long residentVersion);
 
+    Integer updateInDorRelyDoubleVersion(@Param("dormitoryId") Integer dormitoryId,  @Param("bedId")Integer bedId,@Param("currentCapacity")Integer currentCapacity,@Param("residentId") String residentId,@Param("dormitoryVersion")Long dormitoryVersion,@Param("residentVersion")Long residentVersion);
+
     Integer queryResidentCount(@Param("dormitoryId") Integer dormitoryId);
 
     List<DormitoryIdAndCount> queryBatchResidentCount(@Param("list") List<Integer> dormitoryIdList);
@@ -55,4 +57,5 @@ public interface DormitoryResidentDao {
 
     DormitoryIdAndVersion queryIdAndVersionByResidentName(@Param("residentId")String residentId);
 
+    DormitoryNameAndBedId queryDormitoryNameAndBedId(@Param("residentId")String residentId);
 }

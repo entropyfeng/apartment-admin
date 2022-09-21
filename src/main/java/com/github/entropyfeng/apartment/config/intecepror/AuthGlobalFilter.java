@@ -88,19 +88,25 @@ public class AuthGlobalFilter implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String method = request.getMethod();
         String path = request.getServletPath();
-        if (logger.isDebugEnabled()){
-            logger.debug("request method {} ,path {}",method,path);
+        if (logger.isInfoEnabled()){
+            logger.info("request method {} ,path {}",method,path);
         }
         String authToken = request.getHeader(AUTH_TOKEN_FIELD_NAME);
         boolean res = false;
         JwtAccount jwtAccount = parseToken(authToken, response);
         if (jwtAccount != null) {
-            res = authService.checkPerm(jwtAccount.getRoles(), method, path);
+            //管理员不需要权限验证
+            if (jwtAccount.getRoles().contains("administrator")){
+                res=true;
+            }else {
+                res = authService.checkPerm(jwtAccount.getRoles(), method, path);
+            }
+
         }
         if (!res){
             Message message=new Message();
             message.setSuccess(false);
-            message.setErrorMessage("无权限");
+            message.setErrorMessage("no permission");
             String jsonString = null;
             try {
                 jsonString = MessageUtil.toJsonString(message);

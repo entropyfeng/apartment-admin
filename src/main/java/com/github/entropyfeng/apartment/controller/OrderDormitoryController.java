@@ -1,6 +1,7 @@
 package com.github.entropyfeng.apartment.controller;
 
 import com.github.entropyfeng.apartment.domain.vo.DormitoryVO;
+import com.github.entropyfeng.apartment.service.ApartmentScheduleService;
 import com.github.entropyfeng.apartment.service.OrderDormitoryService;
 import com.github.entropyfeng.common.config.anno.CurrentUserAnno;
 import com.github.entropyfeng.common.domain.CurrentUser;
@@ -19,12 +20,26 @@ import java.util.List;
 public class OrderDormitoryController {
 
 
-    final
-    OrderDormitoryService orderService;
+    final OrderDormitoryService orderService;
+    final ApartmentScheduleService scheduleService;
 
     @Autowired
-    public OrderDormitoryController(OrderDormitoryService orderService) {
+    public OrderDormitoryController(OrderDormitoryService orderService,ApartmentScheduleService scheduleService) {
         this.orderService = orderService;
+        this.scheduleService=scheduleService;
+    }
+
+    @GetMapping("/apartment/schedule")
+    public Message acquireAvailableSchedule(@ApiIgnore @CurrentUserAnno CurrentUser currentUser){
+       String userName= currentUser.getUserName();
+
+
+      String scheduleName= scheduleService.acquireMyScheduleName(userName);
+
+      Message message=new Message();
+      message.setSuccess(true);
+      return message;
+
     }
 
     @GetMapping("/apartment/university/available/dormitories")
@@ -83,11 +98,9 @@ public class OrderDormitoryController {
     @PostMapping("/apartment/my/checkIn")
     public Message checkInMyDormitory(@ApiIgnore @CurrentUserAnno CurrentUser currentUser, @RequestParam("dormitoryId") Integer dormitoryId, @RequestParam("bedId") Integer bedId) {
         Message message = new Message();
-
         message.setSuccess(true);
         orderService.checkInDormitory(currentUser.getUserName(), dormitoryId, bedId);
         message.addData("checkInStatus", true);
-
         return message;
     }
 
@@ -107,4 +120,38 @@ public class OrderDormitoryController {
 
         return message;
     }
+
+
+    @PostMapping("/apartment/checkIn")
+    public Message checkInDormitory(@RequestParam("residentId")String residentId,@RequestParam("dormitoryId") Integer dormitoryId, @RequestParam("bedId") Integer bedId){
+        Message message = new Message();
+
+        try {
+            orderService.checkInDormitory(residentId,dormitoryId,bedId);
+            message.setSuccess(true);
+            message.addData("checkOutStatus", true);
+        }catch (BusinessException e){
+            message.addData("checkOutStatus", false);
+            e.printStackTrace();
+        }
+
+        return message;
+    }
+
+    @PostMapping("/apartment/checkOut")
+    public Message checkOutDormitory(@RequestParam("residentId")String residentId) {
+
+        Message message = new Message();
+        message.setSuccess(true);
+        try {
+            orderService.checkOutDormitory(residentId);
+            message.addData("checkOutStatus", true);
+        } catch (BusinessException e) {
+            message.addData("checkOutStatus", false);
+            e.printStackTrace();
+        }
+
+        return message;
+    }
+
 }

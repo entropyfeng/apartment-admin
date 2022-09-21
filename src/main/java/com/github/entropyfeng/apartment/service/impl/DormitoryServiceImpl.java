@@ -1,5 +1,6 @@
 package com.github.entropyfeng.apartment.service.impl;
 
+
 import com.github.entropyfeng.apartment.config.cache.CampusCache;
 import com.github.entropyfeng.apartment.dao.BuildingDao;
 import com.github.entropyfeng.apartment.dao.DormitoryDao;
@@ -8,10 +9,8 @@ import com.github.entropyfeng.apartment.dao.StudentDao;
 import com.github.entropyfeng.apartment.domain.DormitoryDirection;
 import com.github.entropyfeng.apartment.domain.InGender;
 import com.github.entropyfeng.apartment.domain.po.Dormitory;
-import com.github.entropyfeng.apartment.domain.to.BuildingAndGroup;
-import com.github.entropyfeng.apartment.domain.to.DormitoryAndResident;
-import com.github.entropyfeng.apartment.domain.to.StudentResident;
-import com.github.entropyfeng.apartment.domain.to.StudentTo;
+import com.github.entropyfeng.apartment.domain.po.DormitoryResident;
+import com.github.entropyfeng.apartment.domain.to.*;
 import com.github.entropyfeng.apartment.domain.vo.DetailDormitory;
 import com.github.entropyfeng.apartment.domain.vo.DormitoryVO;
 import com.github.entropyfeng.apartment.service.ApartmentIdService;
@@ -100,6 +99,7 @@ public class DormitoryServiceImpl implements DormitoryService {
             dormitory.setDormitoryDirection(DormitoryDirection.toDormitoryDirection(dormitoryVO.getDormitoryDirection()));
             dormitory.setTotalCapacity(dormitoryVO.getTotalCapacity());
             dormitory.setDescription(dormitoryVO.getDescription());
+            dormitory.setCurrentCapacity(0);
 
             dormitoryDao.insertSelective(dormitory);
             return;
@@ -142,6 +142,18 @@ public class DormitoryServiceImpl implements DormitoryService {
        return dormitoryDao.selectBedNum();
     }
 
+    @Override
+    public boolean isInDormitory(String residentId) {
+
+       Integer res= dormitoryDao.queryExistResident(residentId);
+        return res != null;
+    }
+
+    @Override
+    public DormitoryNameAndBedId queryDormitoryNameAndBedId(String residentId) {
+        return dormitoryResidentDao.queryDormitoryNameAndBedId(residentId);
+    }
+
     private DetailDormitory acquireDetailDormitory(@NotNull Dormitory dormitory) {
         BuildingAndGroup buildingAndGroup = campusCache.getBuildingAndGroup(dormitory.getBuildingId());
         List<DormitoryAndResident> dormitoryAndResidents = dormitoryResidentDao.queryDormitoryCurrentInfoByDormitoryId(dormitory.getDormitoryId());
@@ -166,6 +178,7 @@ public class DormitoryServiceImpl implements DormitoryService {
 
         return new DetailDormitory(dormitory, buildingAndGroup, studentResidents);
     }
+
 
     @Override
     public DetailDormitory queryMyDormitory(String username) {

@@ -1,15 +1,18 @@
 package com.github.entropyfeng.apartment.service.impl;
 
 import com.alibaba.excel.EasyExcel;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.entropyfeng.apartment.config.cache.CollegeCache;
 import com.github.entropyfeng.apartment.dao.StudentDao;
+import com.github.entropyfeng.apartment.domain.AccountStatus;
 import com.github.entropyfeng.apartment.domain.Gender;
-import com.github.entropyfeng.apartment.domain.StudentAccountStatus;
+import com.github.entropyfeng.apartment.domain.StudentStatus;
 import com.github.entropyfeng.apartment.domain.excel.StudentExcel;
 import com.github.entropyfeng.apartment.domain.excel.StudentExcelListener;
 import com.github.entropyfeng.apartment.domain.po.Student;
 import com.github.entropyfeng.apartment.domain.to.RegisterUserTo;
 import com.github.entropyfeng.apartment.domain.to.StudentTo;
+import com.github.entropyfeng.apartment.domain.vo.SimpleStudentInfo;
 import com.github.entropyfeng.apartment.domain.vo.StudentVO;
 import com.github.entropyfeng.apartment.service.AuthUserService;
 import com.github.entropyfeng.apartment.service.StudentService;
@@ -18,7 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -78,7 +81,7 @@ public class StudentServiceImpl implements StudentService {
         registerUserTo.setPhone(student.getPhone());
         registerUserTo.setEmail(student.getEmail());
         authUserService.registerUser(registerUserTo, roleList);
-        studentDao.updateAccountStatus(studentId,StudentAccountStatus.EXIST);
+        studentDao.updateAccountStatus(studentId, AccountStatus.EXIST);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -92,11 +95,12 @@ public class StudentServiceImpl implements StudentService {
     public void deleteAccountForSingleStudent(String studentId) {
 
         authUserService.deleteSingleUser(studentId);
+
     }
 
     @Transactional(rollbackFor = Exception.class)
     public void createAccount(List<Student> students, List<String> roleNames, int limit) {
-        List<Student> noAccountStudents = students.stream().filter(student -> student.getStudentAccountStatus().equals(StudentAccountStatus.NOT_EXIST)).collect(Collectors.toList());
+        List<Student> noAccountStudents = students.stream().filter(student -> student.getAccountStatus().equals(AccountStatus.NOT_EXIST)).collect(Collectors.toList());
         if (limit > 0) {
             noAccountStudents = noAccountStudents.stream().limit(limit).collect(Collectors.toList());
         }
@@ -112,7 +116,7 @@ public class StudentServiceImpl implements StudentService {
         authUserService.batchRegisterUser(registerUserTos, roleNames);
 
         noAccountStudents.forEach(student -> {
-            studentDao.updateAccountStatus(student.getStudentId(), StudentAccountStatus.EXIST);
+            studentDao.updateAccountStatus(student.getStudentId(), AccountStatus.EXIST);
         });
 
     }
@@ -122,13 +126,25 @@ public class StudentServiceImpl implements StudentService {
 
         List<StudentTo> studentTos = new ArrayList<>();
         StudentExcelListener listener = new StudentExcelListener(studentTos);
-        EasyExcel.read(file.getInputStream(), StudentExcel.class, listener);
+
+
+        EasyExcel.read(file.getInputStream(), StudentExcel.class,listener).sheet().doRead();
+        if (logger.isInfoEnabled()){
+
+            ObjectMapper objectMapper=new ObjectMapper();
+            String res= objectMapper.writeValueAsString(studentTos.stream().map(StudentTo::getStudentId).collect(Collectors.toList()));
+            logger.info("attempt insert student by excel {}",res);
+
+        }
+
         insertBatchStudent(studentTos);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void insertBatchStudent(List<StudentTo> studentList) {
         studentList.forEach(this::insertStudent);
+
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -143,7 +159,8 @@ public class StudentServiceImpl implements StudentService {
         student.setEmail(studentTo.getEmail());
         student.setRegisterYear(studentTo.getRegisterYear());
         student.setGender(Gender.toInGender(studentTo.getGender()));
-
+        student.setAccountStatus(AccountStatus.NOT_EXIST);
+        student.setStudentStatus(StudentStatus.ADMITTED_NOT_REGISTERED);
         studentDao.insertStudent(student);
     }
 
@@ -183,8 +200,52 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
+    public List<SimpleStudentInfo> querySimpleStudentInfoList(List<String> studentIdList) {
+
+        return   studentDao.querySimpleStudentInfoList(studentIdList);
+    }
+
+    @Override
+    public List<SimpleStudentInfo> querySimpleStudentInfoByConditionAnd(String studentName,String studentId, String collegeName, String registerYear, Gender gender) {
+        return studentDao.querySimpleStudentAnd(studentName,studentId, collegeName, gender, registerYear);
+    }
+
+    @Override
+    public List<SimpleStudentInfo> querySimpleStudentInfoByConditionOr(String studentName,String studentId, String collegeName, String registerYear, Gender gender) {
+        return studentDao.querySimpleStudentOr(studentName,studentId, collegeName, gender, registerYear);
+    }
+
+
+    @Override
     public List<StudentVO> queryStudents() {
         return studentDao.queryAllStudents().stream().map(student -> new StudentVO(student, collegeCache.getName(student.getCollegeId()))).collect(Collectors.toList());
 
+    }
+
+    @Override
+    public StudentVO querySingleStudent(String type, String studentId, String phone, String email, String idCardNumber) {
+        Student student=null;
+        if(StringUtils.isEmpty(type)){
+
+            if (!StringUtils.isEmpty(studentId)){
+               student= studentDao.queryStudentByStudentId(studentId);
+            }else if (!StringUtils.isEmpty(phone)){
+                student=studentDao.queryStudentByPhone(phone);
+            }else if(!StringUtils.isEmpty(idCardNumber)){
+                student=studentDao.queryStudentByIdCardNumber(idCardNumber);
+            }
+        }else {
+            switch (type){
+                case "studentId":student=studentDao.queryStudentByStudentId(studentId);break;
+                case "phone":student=studentDao.queryStudentByPhone(phone);break;
+                case "idCardNumber":student=studentDao.queryStudentByIdCardNumber(idCardNumber);break;
+                default:break;
+            }
+        }
+        if (student!=null){
+            return new StudentVO(student,collegeCache.getName(student.getCollegeId()));
+        }
+
+        return null;
     }
 }

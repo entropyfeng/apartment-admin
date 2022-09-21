@@ -3,6 +3,7 @@ package com.github.entropyfeng.apartment.domain.po;
 import java.util.Date;
 
 public class DormitoryResident {
+
     private String residentId;
     private Integer dormitoryId;
     private Integer bedId;

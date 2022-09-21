@@ -3,14 +3,13 @@ package com.github.entropyfeng.apartment.dao;
 import com.github.entropyfeng.apartment.domain.DormitoryDirection;
 import com.github.entropyfeng.apartment.domain.InGender;
 import com.github.entropyfeng.apartment.domain.po.Dormitory;
-import io.swagger.models.auth.In;
+import com.github.entropyfeng.apartment.domain.po.ResidentBlock;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.bind.annotation.PostMapping;
 
-import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 @Mapper
@@ -24,14 +23,22 @@ public interface DormitoryDao {
                          @Param("totalCapacity") Integer totalCapacity,
                          @Param("inGender") InGender inGender,
                          @Param("dormitoryDirection") DormitoryDirection dormitoryDirection,
+                         @Param("targetResident")List<ResidentBlock> targetResident,
                          @Param("description") String description);
-
     void truncateDormitory();
 
     Dormitory queryDormitoryByDormitoryName(@Param("dormitoryName") String dormitoryName);
 
+    String selectCampusGroupNameByDormitoryId(@Param("dormitoryId")Integer dormitoryId);
+    String selectDormitoryNameByDormitoryId(@Param("dormitoryId")Integer dormitoryId);
+    Integer selectCampusGroupIdByDormitoryId(@Param("dormitoryId")Integer dormitoryId);
+    String selectBuildingNameByDormitoryId(@Param("dormitoryId")Integer dormitoryId);
+    Integer selectBuildingIdByDormitoryId(@Param("dormitoryId")Integer dormitoryId);
     List<Dormitory> queryAllDormitory();
 
+    List<Dormitory> queryBatchDormitory(@Param("list") List<Integer> dormitoryIds);
+
+    Integer queryTotalCapacity(@Param("dormitoryId")Integer dormitoryId);
     int insertSelective(Dormitory record);
 
     int deleteDormitoryByDormitoryName(@Param("dormitoryName")String dormitoryName);
@@ -53,9 +60,18 @@ public interface DormitoryDao {
 
     Dormitory filterDormitoryByGender(@Param("inGender") InGender inGender);
 
-    Integer updateCurrentCapacityRelyVersion(@Param("dormitoryId") Integer dormitoryId,@Param("currentCapacity")Integer currentCapacity,@Param("version")Long version);
+    /**
+     * 更新整个json模块
+     * @param dormitoryId id
+     * @param residentBlock {@link ResidentBlock}
+     * @return 受影响的行数
+     */
+    Integer initTargetResident(@Param("dormitoryId")Integer dormitoryId, @Param("residentBlock")ResidentBlock residentBlock);
 
-    Integer updateCurrentCapacityRelyDoubleVersion(@Param("dormitoryId")Integer dormitoryId,@Param("currentCapacity")Integer currentCapacity,@Param("residentVersion")Long residentVersion,@Param("dormitoryVersion")Long dormitoryVersion);
 
+    Integer checkInTargetResident(@Param("dormitoryId")Integer dormitoryId,@Param("bedId")Integer bedId,@Param("residentId")String residentId );
 
+    Integer checkOutTargetResident(@Param("dormitoryId")Integer dormitoryId,@Param("bedId")Integer bedId);
+
+    Integer queryExistResident(@Param("residentId")String residentId);
 }

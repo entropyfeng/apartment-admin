@@ -77,7 +77,6 @@ public class DormitoryController {
        message.addData("dormitory",dormitory);
        return message;
 
-
     }
 
     @GetMapping("/apartment/dormitory/my")

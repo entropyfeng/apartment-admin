@@ -1,7 +1,7 @@
 package com.github.entropyfeng.apartment.domain.vo;
 
+import com.github.entropyfeng.apartment.domain.AccountStatus;
 import com.github.entropyfeng.apartment.domain.Gender;
-import com.github.entropyfeng.apartment.domain.StudentAccountStatus;
 import com.github.entropyfeng.apartment.domain.StudentStatus;
 import com.github.entropyfeng.apartment.domain.po.Student;
 
@@ -17,6 +17,9 @@ public class StudentVO {
     private String email;
     private String phone;
     private Gender gender;
+    private boolean inDor;
+    private String dormitoryName;
+    private Integer bedId;
     private Date createTime;
     private Date updateTime;
     private String registerYear;
@@ -24,7 +27,7 @@ public class StudentVO {
 
 
     //账号状态
-    private String studentAccountStatus;
+    private String accountStatus;
 
 
     public StudentVO() {
@@ -44,10 +47,10 @@ public class StudentVO {
             this.studentStatus = student.getStudentStatus().name();
         }
 
-        if (student.getStudentAccountStatus()==null){
-            this.studentAccountStatus=StudentAccountStatus.UNKNOWN.name();
+        if (student.getAccountStatus()==null){
+            this.accountStatus= AccountStatus.UNKNOWN.name();
         }else {
-            this.studentAccountStatus=student.getStudentAccountStatus().name();
+            this.accountStatus=student.getAccountStatus().name();
         }
 
         this.email = student.getEmail();
@@ -149,12 +152,12 @@ public class StudentVO {
         this.studentStatus = studentStatus;
     }
 
-    public String getStudentAccountStatus() {
-        return studentAccountStatus;
+    public String getAccountStatus() {
+        return accountStatus;
     }
 
-    public void setStudentAccountStatus(String studentAccountStatus) {
-        this.studentAccountStatus = studentAccountStatus;
+    public void setAccountStatus(String accountStatus) {
+        this.accountStatus = accountStatus;
     }
 
     public String getRegisterYear() {
@@ -171,5 +174,29 @@ public class StudentVO {
 
     public void setCollegeName(String collegeName) {
         this.collegeName = collegeName;
+    }
+
+    public boolean isInDor() {
+        return inDor;
+    }
+
+    public void setInDor(boolean inDor) {
+        this.inDor = inDor;
+    }
+
+    public String getDormitoryName() {
+        return dormitoryName;
+    }
+
+    public void setDormitoryName(String dormitoryName) {
+        this.dormitoryName = dormitoryName;
+    }
+
+    public Integer getBedId() {
+        return bedId;
+    }
+
+    public void setBedId(Integer bedId) {
+        this.bedId = bedId;
     }
 }

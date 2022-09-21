@@ -1,6 +1,8 @@
 package com.github.entropyfeng.apartment.service;
 
+import com.github.entropyfeng.apartment.domain.Gender;
 import com.github.entropyfeng.apartment.domain.to.StudentTo;
+import com.github.entropyfeng.apartment.domain.vo.SimpleStudentInfo;
 import com.github.entropyfeng.apartment.domain.vo.StudentVO;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,6 +18,7 @@ public interface StudentService {
     void createAccountForSingleStudent(String studentId);
 
     void modifyStudentPassword(String studentId,String newPassword);
+
     void deleteAccountForSingleStudent(String studentId);
 
     void insertStudentByExcel(MultipartFile file)throws IOException;
@@ -26,5 +29,10 @@ public interface StudentService {
 
     void deleteSingleStudent(String studentId);
     void updateStudent(StudentTo studentTo);
+    List<SimpleStudentInfo> querySimpleStudentInfoList(List<String> studentIdList);
+    List<SimpleStudentInfo> querySimpleStudentInfoByConditionAnd(String studentName,String studentId,String collegeName, String registerYear, Gender gender);
+    List<SimpleStudentInfo> querySimpleStudentInfoByConditionOr(String studentName,String studentId,String collegeName, String registerYear, Gender gender);
     List<StudentVO> queryStudents();
+
+    StudentVO querySingleStudent(String type,String studentId,String phone,String email,String idCardNumber);
 }

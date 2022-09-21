@@ -13,6 +13,10 @@
     <result column="create_time" property="createTime" />
     <result column="update_time" property="updateTime" />
   </resultMap>
+  <resultMap id="DormitoryNameAndBedIdMap" type="com.github.entropyfeng.apartment.domain.to.DormitoryNameAndBedId">
+    <result column="dormitory_name" property="dormitoryName"/>
+    <result column="bed_id" property="bedId"/>
+  </resultMap>
   <resultMap id="ResidentBedVersionMap" type="com.github.entropyfeng.apartment.domain.to.ResidentBedVersion">
 
     <id column="resident_id" property="residentId"/>
@@ -70,8 +74,14 @@ where dormitory_resident.dormitory_id=#{dormitoryId} and dormitory_resident.bed_
 and dormitory_resident.version=#{dormitoryVersion} and dormitory.version=#{residentVersion}
 
     </update>
+  <update id="updateInDorRelyDoubleVersion">
+    update dormitory_resident ,dormitory set resident_id=#{residentId},dormitory.current_capacity=#{currentCapacity},dormitory.version=#{dormitoryVersion}+1,dormitory_resident.version=#{residentVersion}+1
+    where dormitory_resident.dormitory_id=#{dormitoryId} and dormitory_resident.bed_id=#{bedId} and
+          dormitory_resident.dormitory_id=dormitory.dormitory_id
+      and dormitory_resident.version=#{residentVersion} and dormitory.version=#{dormitoryVersion}
+  </update>
 
-    <select id="queryDormitoryCurrentInfo"
+  <select id="queryDormitoryCurrentInfo"
           resultMap="ResidentAndBedMap"
           resultType="com.github.entropyfeng.apartment.domain.to.ResidentAndBed">
     select resident_id,bed_id from dormitory_resident where dormitory_id=#{dormitoryId}
@@ -86,14 +96,12 @@ and dormitory_resident.version=#{dormitoryVersion} and dormitory.version=#{resid
     select count(resident_id) from dormitory_resident where dormitory_id=#{dormitoryId}
   </select>
   <select id="queryBatchResidentCount" resultType="com.github.entropyfeng.apartment.domain.to.DormitoryIdAndCount"
-  resultMap="BatchResidentCountMap"
-  >
+  resultMap="BatchResidentCountMap">
     select dormitory_id,count(resident_id) as current_count from dormitory_resident where dormitory_id in
     <foreach collection="list" item="id" open="(" separator="," close=")">
       #{id}
     </foreach>
     group by dormitory_id
-
   </select>
   <select id="querySingleResidentStatus" resultType="java.lang.Boolean">
     select 1 from dormitory_resident where resident_id=#{residentId}
@@ -136,6 +144,11 @@ and dormitory_resident.version=#{dormitoryVersion} and dormitory.version=#{resid
           resultType="com.github.entropyfeng.apartment.domain.po.DormitoryResident">
     select <include refid="BaseSql"/> from dormitory_resident where resident_id=#{residentId}
   </select>
+  <select id="queryDormitoryNameAndBedId"
+          resultMap="DormitoryNameAndBedIdMap"
+          resultType="com.github.entropyfeng.apartment.domain.to.DormitoryNameAndBedId">
 
+ select dormitory_name,bed_id from dormitory_resident,dormitory where dormitory_resident.resident_id=#{residentId} and dormitory_resident.dormitory_id=dormitory.dormitory_id
+  </select>
 
 </mapper>

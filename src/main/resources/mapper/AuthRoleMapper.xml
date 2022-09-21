@@ -28,56 +28,69 @@
         <result column="auth_role_name" property="authRoleName"/>
     </resultMap>
     <sql id="resourceSql">
-   auth_resource_id,auth_resource_name,auth_path,auth_method,auth_status,auth_description,create_time,update_time
-  </sql>
+        auth_resource_id,auth_resource_name,auth_path,auth_method,auth_status,auth_description,create_time,update_time
+    </sql>
     <sql id="baseSql">
-auth_role.auth_role_id,auth_role.auth_role_name,auth_role.auth_status,auth_role.auth_description,auth_role.create_time,auth_role.update_time
-  </sql>
+        auth_role.auth_role_id,auth_role.auth_role_name,auth_role.auth_status,auth_role.auth_description,auth_role.create_time,auth_role.update_time
+    </sql>
     <insert id="insertAuthRole" useGeneratedKeys="true">
-    insert into auth_role(auth_role_id,auth_role_name)VALUES (#{authRoleId},#{authRoleName})
-  </insert>
+        insert into auth_role(auth_role_id, auth_role_name)
+        VALUES (#{authRoleId}, #{authRoleName})
+    </insert>
     <insert id="insertResourceIntoRole" useGeneratedKeys="true">
-    insert into auth_role_resource(auth_role_id,auth_resource_id)VALUES (#{authRoleId},#{authResourceId})
+        insert into auth_role_resource(auth_role_id, auth_resource_id)
+        VALUES (#{authRoleId}, #{authResourceId})
 
-  </insert>
+    </insert>
     <update id="truncateAuthRole">
-    truncate table auth_role
-  </update>
+        truncate table auth_role
+    </update>
     <update id="truncateAuthRoleResource">
-    truncate table auth_role_resource
-  </update>
+        truncate table auth_role_resource
+    </update>
 
     <delete id="deleteAuthRoleById">
-    delete from auth_role where auth_role_id=#{authRoleId}
-  </delete>
+        delete
+        from auth_role
+        where auth_role_id = #{authRoleId}
+    </delete>
     <delete id="deleteRelationBetweenRoleAndResource">
-    delete from auth_role_resource where auth_role_id=#{authRoleId} and auth_resource_id=#{authResourceId}
+        delete
+        from auth_role_resource
+        where auth_role_id = #{authRoleId}
+          and auth_resource_id = #{authResourceId}
 
-  </delete>
+    </delete>
     <delete id="deleteBatchAuthRole">
-        delete from auth_role where auth_role_name in   <foreach collection="list"  item="authRoleName" open="(" separator="," close=")"  >
-        #{authRoleName}
-    </foreach>
+        delete from auth_role where auth_role_name in
+        <foreach collection="list" item="authRoleName" open="(" separator="," close=")">
+            #{authRoleName}
+        </foreach>
     </delete>
     <delete id="deleteBatchRolesInUser">
-        delete from auth_user_role where auth_user_id=#{authUserId} and auth_role_id in  <foreach collection="list"  item="id" open="(" separator="," close=")"  >
-        #{id}
-    </foreach>
+        delete from auth_user_role where auth_user_id=#{authUserId} and auth_role_id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
     </delete>
     <delete id="deleteRelativeRoleByName">
-        delete  from auth_user_role where auth_user_id =(select auth_user_id from auth_user where auth_user.auth_username=#{authUserName})
+        delete
+        from auth_user_role
+        where auth_user_id = (select auth_user_id from auth_user where auth_user.auth_username = #{authUserName})
     </delete>
     <delete id="deleteRelativeRoleById">
-        delete from auth_user_role where auth_user_id=#{authUserId}
+        delete
+        from auth_user_role
+        where auth_user_id = #{authUserId}
     </delete>
 
-    <insert id="createBatchRolesInUser" useGeneratedKeys="true" keyColumn="id" >
-         insert into auth_user_role(auth_user_id,auth_role_id)  values
-           <foreach collection="list" separator="," item="item">
-        (
-        #{authUserId},#{item}
-        )
-           </foreach>
+    <insert id="createBatchRolesInUser" useGeneratedKeys="true" keyColumn="id">
+        insert into auth_user_role(auth_user_id,auth_role_id) values
+        <foreach collection="list" separator="," item="item">
+            (
+            #{authUserId},#{item}
+            )
+        </foreach>
     </insert>
     <select id="queryRoleById" resultType="com.github.entropyfeng.apartment.domain.po.AuthRole"
             resultMap="BaseResultMap">
@@ -101,49 +114,74 @@ auth_role.auth_role_id,auth_role.auth_role_name,auth_role.auth_status,auth_role.
         auth_role.auth_role_id=auth_user_role.auth_role_id
     </select>
     <select id="queryRoleIdByName" resultType="java.lang.Long">
-    select auth_role_id from auth_role where auth_role_name=#{authRoleName}
-  </select>
+        select auth_role_id
+        from auth_role
+        where auth_role_name = #{authRoleName}
+    </select>
     <select id="queryRoleAndResource" resultMap="RoleAndResourceMap"
             resultType="com.github.entropyfeng.apartment.domain.to.RoleAndResource">
 
-select auth_role_name,auth_method, auth_path from auth_role,auth_resource,auth_role_resource where auth_role.auth_role_id=auth_role_resource.auth_role_id and auth_resource.auth_resource_id=auth_role_resource.auth_resource_id
-  </select>
+        select auth_role_name, auth_method, auth_path
+        from auth_role,
+             auth_resource,
+             auth_role_resource
+        where auth_role.auth_role_id = auth_role_resource.auth_role_id
+          and auth_resource.auth_resource_id = auth_role_resource.auth_resource_id
+    </select>
     <select id="queryAllRoles" resultMap="BaseResultMap"
             resultType="com.github.entropyfeng.apartment.domain.po.AuthRole">
         select
         <include refid="baseSql"/>
         from auth_role
     </select>
-  <select id="queryRoleInUserByName" resultMap="BaseResultMap" resultType="com.github.entropyfeng.apartment.domain.po.AuthRole">
-      select
-      <include refid="baseSql"/>
-      from auth_role,auth_user_role,auth_user where auth_user.auth_username=#{authUserName}and auth_user_role.auth_user_id=auth_user.auth_user_id and
-      auth_role.auth_role_id=auth_user_role.auth_role_id
-  </select>
+    <select id="queryRoleInUserByName" resultMap="BaseResultMap"
+            resultType="com.github.entropyfeng.apartment.domain.po.AuthRole">
+        select
+        <include refid="baseSql"/>
+        from auth_role,auth_user_role,auth_user where auth_user.auth_username=#{authUserName}and
+        auth_user_role.auth_user_id=auth_user.auth_user_id and
+        auth_role.auth_role_id=auth_user_role.auth_role_id
+    </select>
     <select id="queryRoleNameInUserByName" resultType="java.lang.String">
-        select auth_role.auth_role_name from auth_role,auth_user_role,auth_user where auth_user.auth_username=#{authUserName}and auth_user_role.auth_user_id=auth_user.auth_user_id and
+        select auth_role.auth_role_name
+        from auth_role,
+             auth_user_role,
+             auth_user
+        where auth_user.auth_username = #{authUserName}and auth_user_role.auth_user_id=auth_user.auth_user_id and
       auth_role.auth_role_id=auth_user_role.auth_role_id
     </select>
     <select id="queryRoleIdInUserByName" resultType="java.lang.Long">
-          select auth_role.auth_role_id from auth_role,auth_user_role,auth_user where auth_user.auth_username=#{authUserName}and auth_user_role.auth_user_id=auth_user.auth_user_id and
+        select auth_role.auth_role_id
+        from auth_role,
+             auth_user_role,
+             auth_user
+        where auth_user.auth_username = #{authUserName}and auth_user_role.auth_user_id=auth_user.auth_user_id and
       auth_role.auth_role_id=auth_user_role.auth_role_id
     </select>
 
-    <select id="queryAllRolesByPage" resultMap="BaseResultMap" resultType="com.github.entropyfeng.apartment.domain.po.AuthRole">
-        select <include refid="baseSql"/> from auth_role
+    <select id="queryAllRolesByPage" resultMap="BaseResultMap"
+            resultType="com.github.entropyfeng.apartment.domain.po.AuthRole">
+        select
+        <include refid="baseSql"/>
+        from auth_role
     </select>
 
 
-    <select id="queryAuthRoles" resultMap="BaseResultMap" resultType="com.github.entropyfeng.apartment.domain.po.AuthRole">
-        select <include refid="baseSql"/> from auth_role where auth_role_name in
+    <select id="queryAuthRoles" resultMap="BaseResultMap"
+            resultType="com.github.entropyfeng.apartment.domain.po.AuthRole">
+        select
+        <include refid="baseSql"/>
+        from auth_role where auth_role_name in
 
-        <foreach collection="list"  item="authRoleName" open="(" separator="," close=")"  >
-        #{authRoleName}
+        <foreach collection="list" item="authRoleName" open="(" separator="," close=")">
+            #{authRoleName}
         </foreach>
 
     </select>
     <select id="queryRoleIdInUserById" resultType="java.lang.Long">
-        select auth_role_id from auth_user_role where auth_user_id=#{authUserId}
+        select auth_role_id
+        from auth_user_role
+        where auth_user_id = #{authUserId}
     </select>
 
 

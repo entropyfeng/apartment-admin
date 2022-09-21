@@ -1,20 +1,23 @@
 package com.github.entropyfeng.apartment.controller;
 
-import com.github.entropyfeng.apartment.dao.CampusGroupDao;
-import com.github.entropyfeng.apartment.domain.po.CampusGroup;
-import com.github.entropyfeng.apartment.domain.po.Dormitory;
 import com.github.entropyfeng.apartment.service.BuildingService;
 import com.github.entropyfeng.apartment.service.CampusService;
 import com.github.entropyfeng.apartment.service.DormitoryService;
 import com.github.entropyfeng.common.domain.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * 获取当前的首页信息
+ */
 @RestController
 public class ApartmentInfoController {
 
 
+    private static final Logger logger= LoggerFactory.getLogger(ApartmentInfoController.class);
     final
     BuildingService buildingService;
 
@@ -31,9 +34,14 @@ public class ApartmentInfoController {
         this.dormitoryService = dormitoryService;
     }
 
+    /**
+     * 为前端提供图表支持
+     * @return {@link Message}
+     */
     @GetMapping("/apartment/base/info")
     public Message acquireApartmentBaseInfo(){
 
+        logger.info("call acquireApartmentBaseInfo");
         Message message=new Message();
 
         message.setSuccess(true);

@@ -6,6 +6,7 @@
 
     <id column="campus_name" property="campusName"/>
     <result column="campus_description" property="description"/>
+
     <result column="create_time" property="createTime" />
     <result column="update_time" property="updateTime" />
 

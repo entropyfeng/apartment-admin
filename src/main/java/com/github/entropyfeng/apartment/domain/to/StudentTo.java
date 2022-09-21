@@ -5,6 +5,7 @@ import com.github.entropyfeng.apartment.domain.po.Student;
 
 public class StudentTo {
 
+
     private String studentId;
     private String studentName;
     private String idCardNumber;
@@ -13,7 +14,6 @@ public class StudentTo {
     private String gender;
     private String collegeName;
     private String registerYear;
-
     public StudentTo() {
 
     }

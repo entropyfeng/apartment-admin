@@ -1,23 +1,19 @@
 package com.github.entropyfeng.apartment.controller;
 
-
 import com.github.entropyfeng.apartment.domain.po.AuthUser;
 import com.github.entropyfeng.apartment.domain.to.LoginTo;
 import com.github.entropyfeng.apartment.domain.vo.CurrentUserVo;
 import com.github.entropyfeng.apartment.exception.AuthUserNotExistException;
 import com.github.entropyfeng.apartment.exception.PasswordErrorException;
-import com.github.entropyfeng.apartment.service.AuthRoleService;
 import com.github.entropyfeng.apartment.service.AuthUserService;
 import com.github.entropyfeng.common.config.anno.CurrentUserAnno;
 import com.github.entropyfeng.common.domain.CurrentUser;
 import com.github.entropyfeng.common.domain.Message;
-import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
-
 import java.util.List;
 
 
@@ -64,6 +60,7 @@ public class AccountController {
         authUserService.resetPassword(currentUser.getUserName(),prePassword,postPassword,false);
         return Message.ok();
     }
+
     @PutMapping("/account/my/email")
     public Message resetMyEmail(@ApiIgnore @CurrentUserAnno CurrentUser currentUser, @RequestParam("prePassword")String prePassword,@RequestParam("postPassword")String postPassword){
 
@@ -73,8 +70,6 @@ public class AccountController {
 
     @PutMapping("/account/my/phone")
     public Message resetMyPhone(@ApiIgnore @CurrentUserAnno CurrentUser currentUser, @RequestParam("prePassword")String prePassword,@RequestParam("postPhone")String postPhone){
-
-
 
         return Message.ok();
     }
@@ -116,7 +111,6 @@ public class AccountController {
 
     @GetMapping("/account/captcha/email")
     public Message requireEmailCaptcha(@RequestParam("email") String email) {
-
         return Message.ok();
     }
 
@@ -137,8 +131,9 @@ public class AccountController {
         return new Message();
     }
 
-    @PostMapping("/account/loginOut")
+    @PostMapping("/account/logout")
     public Message loginOut(@CurrentUserAnno CurrentUser currentUser) {
+
         return Message.ok();
     }
 

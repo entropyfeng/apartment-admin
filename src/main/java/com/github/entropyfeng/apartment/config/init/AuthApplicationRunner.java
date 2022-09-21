@@ -1,7 +1,10 @@
 package com.github.entropyfeng.apartment.config.init;
 
+import com.github.entropyfeng.apartment.config.bean.ApartmentScheduleMap;
 import com.github.entropyfeng.apartment.event.CacheEvent;
+import com.github.entropyfeng.apartment.event.LoadApartmentScheduleEvent;
 import com.github.entropyfeng.apartment.event.LoadRbacEvent;
+import com.github.entropyfeng.apartment.util.SpringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +35,10 @@ public class AuthApplicationRunner implements ApplicationRunner {
     @Async
     @Override
     public void run(ApplicationArguments applicationArguments) {
+  /*      logger.info("before init apartment schedule map bean");
+        SpringUtil.registerSingletonBean("scheduleMapBean",new ApartmentScheduleMap());
+        logger.info("after init apartment schedule map bean");*/
+
         logger.info("publish loadAuthDomain Event");
         eventPublisher.publishEvent(new LoadRbacEvent(this));
         logger.info("after publish loadAuthDomain Event");
@@ -39,5 +46,10 @@ public class AuthApplicationRunner implements ApplicationRunner {
         logger.info("publish cache Event");
         eventPublisher.publishEvent(new CacheEvent(this));
         logger.info("after cache Event");
+
+        //发布公寓预定计划相关信息
+        logger.info("publish load schedule Event");
+        eventPublisher.publishEvent(new LoadApartmentScheduleEvent(this));
+        logger.info("after publish load schedule Event");
     }
 }

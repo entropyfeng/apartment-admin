@@ -2,7 +2,6 @@ package com.github.entropyfeng.apartment;
 
 import com.github.entropyfeng.apartment.dao.*;
 import com.github.entropyfeng.apartment.domain.DormitoryDirection;
-import com.github.entropyfeng.apartment.domain.Gender;
 import com.github.entropyfeng.apartment.domain.InGender;
 import com.github.entropyfeng.apartment.domain.builder.BuildingVOBuilder;
 import com.github.entropyfeng.apartment.domain.builder.DormitoryVOBuilder;
@@ -15,15 +14,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.stereotype.Component;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
+
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@Component
 public class InitApartmentTest {
     @Autowired
     ApartmentIdService idService;
@@ -59,7 +60,6 @@ public class InitApartmentTest {
     @Autowired
     DormitoryResidentDao residentDao;
 
-    private final ThreadLocalRandom random = ThreadLocalRandom.current();
 
     private void clearAll() {
         idService.clearAllIds();
@@ -95,7 +95,7 @@ public class InitApartmentTest {
             for (int roomNumber = 1; roomNumber <= 30; roomNumber++) {
 
                 DormitoryVOBuilder builder = new DormitoryVOBuilder(building.getBuildingName() + "Floor:" + floorNumber + ":" + roomNumber, building.getBuildingName());
-                DormitoryVO simpleDormitoryVO = builder.setFloor(floorNumber).setTotalCapacity(4).setCurrentCapacity(0).setDormitoryDirection(DormitoryDirection.getInGenderByCode(random.nextInt(1, 5))).setInGender(building.getInGender()).build();
+                DormitoryVO simpleDormitoryVO = builder.setFloor(floorNumber).setTotalCapacity(4).setCurrentCapacity(0).setDormitoryDirection(DormitoryDirection.getDormitoryDirectionByCode(roomNumber%5)).setInGender(building.getInGender()).build();
 
                 dormitoryService.addNewDormitory(simpleDormitoryVO);
 
@@ -104,7 +104,7 @@ public class InitApartmentTest {
 
     }
 
-    private InGender handleRandomGender(InGender inGender) {
+    private InGender handleRandomGender(InGender inGender,int i) {
         if (inGender == InGender.UNKNOWN) {
             throw new RuntimeException("can not be unknown");
         }
@@ -113,13 +113,11 @@ public class InitApartmentTest {
         } else if (inGender == InGender.WOMAN) {
             return InGender.WOMAN;
         } else {
-            return random.nextBoolean() ? InGender.WOMAN : InGender.MAN;
+            return i%2==0? InGender.WOMAN : InGender.MAN;
         }
     }
 
-    private int handleRandomFloor() {
-        return random.nextInt(4, 8);
-    }
+
 
     private void buildBuilding() {
         List<CampusGroup> campusGroupList = campusGroupDao.queryAllCampusGroup();
@@ -128,7 +126,7 @@ public class InitApartmentTest {
             for (int i = 0; i < 5; i++) {
                 BuildingVOBuilder buildingVOBuilder = new BuildingVOBuilder(campusGroup.getCampusGroupName() + i, campusGroup.getCampusGroupName());
                 InGender inGender = campusGroup.getInGender();
-                BuildingVO buildingVO = buildingVOBuilder.setInGender(handleRandomGender(inGender)).setHasElevator(random.nextBoolean()).setTotalFloor(handleRandomFloor()).build();
+                BuildingVO buildingVO = buildingVOBuilder.setInGender(handleRandomGender(inGender,i)).setHasElevator(i % 2 == 0).setTotalFloor(i+4).build();
                 buildingService.addNewBuilding(buildingVO);
             }
 
@@ -163,10 +161,7 @@ public class InitApartmentTest {
             Student student=students.get(i);
 
             if (dormitory.getInGender().equals(InGender.MIX)|| GenderHelper.toGender(dormitory.getInGender()).equals(student.getGender())){
-                int res= residentDao.updateDormitoryResidentRelyVersion(resident.getDormitoryId(), resident.getBedId(), student.getStudentId(), resident.getVersion());
-                if (res==1){
-                    dormitoryDao.updateCurrentCapacityRelyVersion(dormitory.getDormitoryId(),dormitory.getCurrentCapacity()+1,dormitory.getVersion());
-                }
+                dormitoryDao.checkInTargetResident(resident.getDormitoryId(),resident.getBedId(),resident.getResidentId());
             }
         }
 

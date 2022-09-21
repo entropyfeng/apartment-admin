@@ -33,7 +33,7 @@ public enum DormitoryDirection {
             default:return UNKNOWN;
         }
     }
-    public static DormitoryDirection getInGenderByCode(Integer code) {
+    public static DormitoryDirection getDormitoryDirectionByCode(Integer code) {
         switch (code) {
             case 1:
                 return WEST;

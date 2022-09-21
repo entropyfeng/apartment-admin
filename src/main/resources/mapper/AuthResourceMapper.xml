@@ -2,56 +2,79 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.github.entropyfeng.apartment.dao.AuthResourceDao">
 
-  <resultMap id="BaseResultMap" type="com.github.entropyfeng.apartment.domain.po.AuthResource">
-  <id column="auth_resource_id" property="authResourceId"/>
-  <result column="auth_resource_name" property="authResourceName"/>
-  <result column="auth_path" property="path"/>
-  <result column="auth_method" property="method"/>
-  <result column="auth_status" property="status"/>
-  <result column="auth_description" property="description"/>
-  <result column="create_time" property="createTime" />
-  <result column="update_time" property="updateTime" />
+    <resultMap id="BaseResultMap" type="com.github.entropyfeng.apartment.domain.po.AuthResource">
+        <id column="auth_resource_id" property="authResourceId"/>
+        <result column="auth_resource_name" property="authResourceName"/>
+        <result column="auth_path" property="path"/>
+        <result column="auth_method" property="method"/>
+        <result column="auth_status" property="status"/>
+        <result column="auth_description" property="description"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
 
-</resultMap>
+    </resultMap>
 
-  <sql id="baseSql">
-auth_resource.auth_resource_id,auth_resource.auth_resource_name,auth_resource.auth_path,auth_resource.auth_method,auth_resource.auth_status,auth_resource.auth_description,auth_resource.create_time,auth_resource.update_time
-  </sql>
+    <sql id="baseSql">
+        auth_resource.auth_resource_id,auth_resource.auth_resource_name,auth_resource.auth_path,auth_resource.auth_method,auth_resource.auth_status,auth_resource.auth_description,auth_resource.create_time,auth_resource.update_time
+    </sql>
 
-  <insert id="insertResource" useGeneratedKeys="true">
-    insert into auth_resource(auth_resource_id,auth_resource_name,auth_path,auth_method) values(#{resourceId},#{resourceName},#{path},#{method})
-  </insert>
-  <update id="truncateAuthResource">
-    truncate table auth_resource
-  </update>
-  <delete id="deleteResourceById">
-    delete from auth_resource where auth_resource_id=#{resourceId}
-  </delete>
-  <select id="queryResourceInRoleById" resultMap="BaseResultMap" resultType="com.github.entropyfeng.apartment.domain.po.AuthResource">
-    select <include refid="baseSql"/> from auth_resource ,auth_role_resource
-    where auth_role_resource.auth_role_id=#{authRoleId} and auth_role_resource.auth_resource_id =auth_resource.auth_resource_id
-  </select>
-  <select id="queryResourceIdByName" resultType="java.lang.Long">
-    select auth_resource_id from auth_resource where auth_resource_name=#{authResourceName}
-  </select>
+    <insert id="insertResource" useGeneratedKeys="true">
+        insert into auth_resource(auth_resource_id, auth_resource_name, auth_path, auth_method)
+        values (#{resourceId}, #{resourceName}, #{path}, #{method})
+    </insert>
+    <update id="truncateAuthResource">
+        truncate table auth_resource
+    </update>
+    <delete id="deleteResourceById">
+        delete
+        from auth_resource
+        where auth_resource_id = #{resourceId}
+    </delete>
+    <select id="queryResourceInRoleById" resultMap="BaseResultMap"
+            resultType="com.github.entropyfeng.apartment.domain.po.AuthResource">
+        select
+        <include refid="baseSql"/>
+        from auth_resource ,auth_role_resource
+        where auth_role_resource.auth_role_id=#{authRoleId} and auth_role_resource.auth_resource_id
+        =auth_resource.auth_resource_id
+    </select>
+    <select id="queryResourceIdByName" resultType="java.lang.Long">
+        select auth_resource_id
+        from auth_resource
+        where auth_resource_name = #{authResourceName}
+    </select>
     <select id="queryResourceInRoleByName" resultMap="BaseResultMap"
             resultType="com.github.entropyfeng.apartment.domain.po.AuthResource">
-      select <include refid="baseSql"/> from auth_resource ,auth_role_resource,auth_role
-      where auth_role.auth_role_name=#{authRoleName}and auth_role.auth_role_id=auth_role_resource.auth_role_id and auth_role_resource.auth_resource_id =auth_resource.auth_resource_id
+        select
+        <include refid="baseSql"/>
+        from auth_resource ,auth_role_resource,auth_role
+        where auth_role.auth_role_name=#{authRoleName}and auth_role.auth_role_id=auth_role_resource.auth_role_id and
+        auth_role_resource.auth_resource_id =auth_resource.auth_resource_id
 
 
     </select>
-    <select id="queryAllResources" resultMap="BaseResultMap" resultType="com.github.entropyfeng.apartment.domain.po.AuthResource">
-      select <include refid="baseSql"/> from auth_resource
+    <select id="queryAllResources" resultMap="BaseResultMap"
+            resultType="com.github.entropyfeng.apartment.domain.po.AuthResource">
+        select
+        <include refid="baseSql"/>
+        from auth_resource
     </select>
-  <select id="queryAllResourcesByPage" resultMap="BaseResultMap" resultType="com.github.entropyfeng.apartment.domain.po.AuthResource">
-    select  <include refid="baseSql"/> from auth_resource
-  </select>
-  <select id="queryResourceNamesInRoleByName" resultType="java.lang.String">
-    select auth_resource.auth_resource_name from auth_resource ,auth_role_resource,auth_role
-    where auth_role.auth_role_name=#{authRoleName} and auth_role.auth_role_id=auth_role_resource.auth_role_id and auth_role_resource.auth_resource_id =auth_resource.auth_resource_id
+    <select id="queryAllResourcesByPage" resultMap="BaseResultMap"
+            resultType="com.github.entropyfeng.apartment.domain.po.AuthResource">
+        select
+        <include refid="baseSql"/>
+        from auth_resource
+    </select>
+    <select id="queryResourceNamesInRoleByName" resultType="java.lang.String">
+        select auth_resource.auth_resource_name
+        from auth_resource,
+             auth_role_resource,
+             auth_role
+        where auth_role.auth_role_name = #{authRoleName}
+          and auth_role.auth_role_id = auth_role_resource.auth_role_id
+          and auth_role_resource.auth_resource_id = auth_resource.auth_resource_id
 
-  </select>
+    </select>
 
 
 </mapper>

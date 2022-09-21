@@ -3,11 +3,8 @@ package com.github.entropyfeng.apartment;
 
 import com.github.entropyfeng.apartment.dao.CollegeDao;
 import com.github.entropyfeng.apartment.dao.StudentDao;
-import com.github.entropyfeng.apartment.domain.Gender;
-import com.github.entropyfeng.apartment.domain.StudentAccountStatus;
-import com.github.entropyfeng.apartment.domain.StudentStatus;
 import com.github.entropyfeng.apartment.domain.po.College;
-import com.github.entropyfeng.apartment.domain.po.Student;
+import com.github.entropyfeng.apartment.domain.to.StudentTo;
 import com.github.entropyfeng.apartment.service.CollegeService;
 import com.github.entropyfeng.apartment.service.StudentService;
 import com.github.entropyfeng.apartment.service.UniversityIdService;
@@ -15,16 +12,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.stereotype.Component;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@Component
 public class InitUniversityTest {
 
     @Autowired
@@ -48,69 +46,71 @@ public class InitUniversityTest {
         studentDao.truncateStudent();
     }
 
-    private void initDepartment() {
+    private ArrayList<String> exportCollegeNames(){
 
-        ArrayList<String> departmentNames = new ArrayList<>();
-        departmentNames.add("物理学院");
-        departmentNames.add("电器学院");
-        departmentNames.add("数学学院");
-        departmentNames.add("电子学院");
-        departmentNames.add("马克思学院");
-        departmentNames.add("文学院");
-        departmentNames.add("航空学院");
-        departmentNames.add("医学院");
-        departmentNames.add("农学院");
-        departmentNames.add("机械学院");
-        departmentNames.add("计算机学院");
-        departmentNames.add("软件学院");
-        departmentNames.add("化学学院");
-        departmentNames.add("能源学院");
+        ArrayList<String> collegeNames = new ArrayList<>();
+        collegeNames.add("物理学院");
+        collegeNames.add("电器学院");
+        collegeNames.add("数学学院");
+        collegeNames.add("电子学院");
+        collegeNames.add("马克思学院");
+        collegeNames.add("文学院");
+        collegeNames.add("航空学院");
+        collegeNames.add("医学院");
+        collegeNames.add("农学院");
+        collegeNames.add("机械学院");
+        collegeNames.add("计算机学院");
+        collegeNames.add("软件学院");
+        collegeNames.add("化学学院");
+        collegeNames.add("能源学院");
+        return collegeNames;
+    }
+    private void initCollege(List<String> collegeNames) {
 
-        departmentNames.forEach(name -> collegeService.addNewCollege(name));
+        collegeNames.forEach(name -> collegeService.addNewCollege(name));
     }
 
-    private void initStudent() {
+    private void initStudent(List<String> collegeNames) {
         List<Integer> collegeIds = collegeDao.queryAllCollege().stream().map(College::getCollegeId).collect(Collectors.toList());
 
-        int departmentSize = collegeIds.size();
-        List<String> firstNames = generateFirstName();
+        int collegeNum = collegeIds.size();
+        List<String> firstNames = exportFirstName();
         AtomicInteger atomicInteger = new AtomicInteger(10);
-        ThreadLocalRandom random = ThreadLocalRandom.current();
+        List<String> secondNames=firstNames.subList(60,120);
+        firstNames.subList(0,60).forEach(first->{
+            secondNames.forEach(second->{
 
-        firstNames.forEach(first -> {
-            if (random.nextInt(100)<1){
-                firstNames.forEach(second -> {
-                    String studentId = "S" + String.format("%09d", atomicInteger.getAndIncrement());
-                    String studentName = first + second;
-                    Student student=new Student();
-                    student.setStudentId(studentId);
-                    student.setCollegeId(random.nextInt(1,departmentSize-1));
-                    student.setEmail(studentId+"@mock.com");
-                    student.setPhone(studentId.substring(1));
-                    student.setGender(random.nextBoolean()?Gender.MAN:Gender.WOMAN);
-                    student.setRegisterYear(random.nextInt(2010,2020)+"");
-                    student.setIdCardNumber(studentId+"china");
-                    student.setStudentName(studentName);
-                    student.setStudentAccountStatus(StudentAccountStatus.NOT_EXIST);
-                    student.setStudentStatus(StudentStatus.REGISTERED);
-                    studentDao.insertStudent(student);
-                });
-            }
+                int tempId= atomicInteger.getAndIncrement();
+                String studentId = "S" + String.format("%09d", tempId);
+                String studentName = first + second;
+                StudentTo studentTo=new StudentTo();
+                studentTo.setStudentId(studentId);
+                studentTo.setCollegeName(collegeNames.get(tempId%collegeNum));
+                studentTo.setEmail(studentId+"@mock.com");
+                studentTo.setPhone(studentId.substring(1));
+                studentTo.setGender(tempId%2==0?"MAN":"WOMAN");
+                studentTo.setRegisterYear(tempId%10+2010+"");
+                studentTo.setIdCardNumber(studentId+"china");
+                studentTo.setStudentName(studentName);
+                studentService.insertStudent(studentTo);
+
+            });
         });
 
 
     }
 
     @Test
-    public void test() {
+    public void init() {
 
         clearAll();
-        initDepartment();
-        initStudent();
+        List<String> collegeNames= exportCollegeNames();
+        initCollege(collegeNames);
+        initStudent(collegeNames);
     }
 
 
-    private List<String> generateFirstName() {
+    private List<String> exportFirstName() {
         return new ArrayList<String>() {{
             add("赵");
             add("钱");

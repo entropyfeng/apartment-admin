@@ -8,7 +8,6 @@ public class DormitoryAndResident {
 
     private Integer bedId;
 
-
     public String getResidentId() {
         return residentId;
     }

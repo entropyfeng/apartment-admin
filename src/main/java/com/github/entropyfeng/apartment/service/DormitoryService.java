@@ -1,5 +1,6 @@
 package com.github.entropyfeng.apartment.service;
 
+import com.github.entropyfeng.apartment.domain.to.DormitoryNameAndBedId;
 import com.github.entropyfeng.apartment.domain.vo.DetailDormitory;
 import com.github.entropyfeng.apartment.domain.vo.DormitoryVO;
 
@@ -17,6 +18,8 @@ public interface DormitoryService {
     int acquireWomanBedNum();
     int acquireManBedNum();
     int acquireBedNum();
+    boolean isInDormitory(String residentId);
+    DormitoryNameAndBedId queryDormitoryNameAndBedId(String residentId);
     DetailDormitory queryMyDormitory(String username);
     DetailDormitory queryDetailDormitory(Integer dormitoryId,List<String> roleList);
     List<DormitoryVO> queryDormitory(DormitoryVO simpleDormitoryVO);
